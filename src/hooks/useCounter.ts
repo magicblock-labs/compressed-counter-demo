@@ -16,6 +16,7 @@ export function useCounter() {
   const [counterEphemeral, setCounterEphemeral] = useState<
     Counter | undefined
   >();
+  const [isDelegated, setIsDelegated] = useState(false);
 
   useEffect(() => {
     async function fetchCounter() {
@@ -27,19 +28,22 @@ export function useCounter() {
           commitment: "confirmed",
         })
         .send();
-      if (accountInfo.value?.data) {
-        console.log(accountInfo.value.data);
+      if (accountInfo.value) {
+        console.log("counter", accountInfo.value);
         if (accountInfo.value.owner === TEST_DELEGATION_PROGRAM_ADDRESS) {
+          setIsDelegated(false);
           const str = getBase58Encoder().encode(accountInfo.value.data);
           console.log(str);
           setCounterMainnet(getCounterDecoder().decode(str));
         } else {
+          setIsDelegated(true);
           accountInfo = await rpcEphemeral
             .getAccountInfo(counterPda, {
               commitment: "confirmed",
             })
             .send();
-          if (accountInfo.value?.data) {
+          if (accountInfo.value) {
+            console.log("counter ephemeral", accountInfo.value);
             const str = getBase58Encoder().encode(accountInfo.value.data);
             console.log(str);
             setCounterEphemeral(getCounterDecoder().decode(str));
@@ -108,5 +112,5 @@ export function useCounter() {
     };
   }, [counterPda]);
 
-  return { counterMainnet, counterEphemeral };
+  return { counterMainnet, counterEphemeral, isDelegated };
 }

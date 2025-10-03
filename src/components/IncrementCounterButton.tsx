@@ -13,12 +13,14 @@ type IncrementCounterButtonProps = Readonly<{
   payer: UiWalletAccount;
   rpc: Rpc<SolanaRpcApiMainnet>;
   rpcSubscriptions: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
+  disabled: boolean;
 }>;
 
 export function IncrementCounterButton({
   payer,
   rpc,
   rpcSubscriptions,
+  disabled,
 }: IncrementCounterButtonProps) {
   const [isIncrementingCounter, setIsIncrementingCounter] = useState(false);
   const { incrementCounter } = useTestDelegation({
@@ -40,7 +42,11 @@ export function IncrementCounterButton({
   }, [incrementCounter]);
 
   return (
-    <Button onClick={handleIncrementCounter} loading={isIncrementingCounter}>
+    <Button
+      onClick={handleIncrementCounter}
+      loading={isIncrementingCounter}
+      disabled={disabled}
+    >
       Increment Counter
     </Button>
   );

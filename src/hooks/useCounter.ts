@@ -7,6 +7,7 @@ import {
   TEST_DELEGATION_PROGRAM_ADDRESS,
 } from "test-delegation";
 import { getBase58Encoder } from "@solana/kit";
+import { COMPRESSED_DELEGATION_PROGRAM_ADDRESS } from "compressed-delegation-program";
 
 export function useCounter() {
   const { rpc, rpcSubscriptions, rpcEphemeral, rpcSubscriptionsEphemeral } =
@@ -67,11 +68,16 @@ export function useCounter() {
         .subscribe({ abortSignal: abortController.signal });
       console.log(subscription);
       for await (const accountInfo of subscription) {
-        console.log("accountInfo", accountInfo);
+        console.log("mainnet accountInfo", accountInfo);
         if (accountInfo.value?.data) {
           const str = getBase58Encoder().encode(accountInfo.value.data);
           console.log(str);
           setCounterMainnet(getCounterDecoder().decode(str));
+          setIsDelegated(false);
+        } else if (
+          accountInfo.value?.owner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS
+        ) {
+          setIsDelegated(true);
         }
       }
     }

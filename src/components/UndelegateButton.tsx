@@ -12,7 +12,7 @@ type UndelegateButtonProps = Readonly<{
 export function UndelegateButton({ payer, disabled }: UndelegateButtonProps) {
   const [isDelegating, setIsDelegating] = useState(false);
   const { rpc, rpcSubscriptions } = useRpc();
-  const { delegateCounter } = useTestDelegation({
+  const { undelegateCounter } = useTestDelegation({
     payer,
     rpc,
     rpcSubscriptions,
@@ -21,14 +21,14 @@ export function UndelegateButton({ payer, disabled }: UndelegateButtonProps) {
   const handleUndelegateCounter = useCallback(async () => {
     setIsDelegating(true);
     try {
-      const signature = await delegateCounter();
+      const signature = await undelegateCounter();
       console.log(signature);
     } catch (error) {
       console.error(error);
     } finally {
       setIsDelegating(false);
     }
-  }, [delegateCounter]);
+  }, [undelegateCounter]);
 
   return (
     <Button

@@ -1,5 +1,4 @@
 import type { ClusterUrl } from "@solana/kit";
-import { devnet } from "@solana/kit";
 import { createContext } from "react";
 
 export type ChainContext = Readonly<{
@@ -15,8 +14,8 @@ export const DEFAULT_CHAIN_CONFIG = Object.freeze({
   chain: "solana:devnet",
   displayName: "Localhost",
   solanaExplorerClusterName: "devnet",
-  solanaRpcSubscriptionsUrl: devnet("ws://localhost:8900"),
-  solanaRpcUrl: devnet("http://localhost:8899"),
+  solanaRpcSubscriptionsUrl: "ws://localhost:8900",
+  solanaRpcUrl: "http://localhost:8899",
 });
 
 export const ChainContext = createContext<ChainContext>(DEFAULT_CHAIN_CONFIG);

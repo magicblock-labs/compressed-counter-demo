@@ -18,9 +18,9 @@ export const RpcContext = createContext<{
   rpcSubscriptionsEphemeral: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
 }>({
   rpc: createSolanaRpc("http://localhost:8899"),
-  rpcEphemeral: createSolanaRpc(devnet("https://mainnet-tee.magicblock.app")),
+  rpcEphemeral: createSolanaRpc(devnet("http://localhost:7799")),
   rpcSubscriptions: createSolanaRpcSubscriptions(devnet("ws://localhost:8900")),
   rpcSubscriptionsEphemeral: createSolanaRpcSubscriptions(
-    devnet("wss://mainnet-tee.magicblock.app")
+    devnet("ws://localhost:7800")
   ),
 });

@@ -47,7 +47,7 @@ function Root() {
                     payer={selectedWalletAccount}
                     rpc={rpc}
                     rpcSubscriptions={rpcSubscriptions}
-                    disabled={isDelegated}
+                    // disabled={isDelegated}
                   />
                   <DelegateButton
                     payer={selectedWalletAccount}
@@ -67,7 +67,7 @@ function Root() {
                     payer={selectedWalletAccount}
                     rpc={rpcEphemeral}
                     rpcSubscriptions={rpcSubscriptionsEphemeral}
-                    disabled={!isDelegated}
+                    // disabled={!isDelegated}
                   />
                   <UndelegateButton
                     payer={selectedWalletAccount}

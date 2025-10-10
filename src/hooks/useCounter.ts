@@ -45,9 +45,13 @@ export function useCounter() {
             .send();
           if (accountInfo.value) {
             console.log("counter ephemeral", accountInfo.value);
-            const str = getBase58Encoder().encode(accountInfo.value.data);
-            console.log(str);
-            setCounterEphemeral(getCounterDecoder().decode(str));
+            const str =
+              typeof accountInfo.value.data === "string"
+                ? accountInfo.value.data
+                : accountInfo.value.data[0];
+            setCounterEphemeral(
+              getCounterDecoder().decode(getBase58Encoder().encode(str))
+            );
           }
         }
       }
@@ -102,11 +106,15 @@ export function useCounter() {
         .subscribe({ abortSignal: abortController.signal });
       console.log(subscription);
       for await (const accountInfo of subscription) {
-        console.log("accountInfo subscription", accountInfo);
+        console.log("ephem subscription", accountInfo);
         if (accountInfo.value?.data) {
-          const str = getBase58Encoder().encode(accountInfo.value.data);
-          console.log(str);
-          setCounterEphemeral(getCounterDecoder().decode(str));
+          const str =
+            typeof accountInfo.value.data === "string"
+              ? accountInfo.value.data
+              : accountInfo.value.data[0];
+          setCounterEphemeral(
+            getCounterDecoder().decode(getBase58Encoder().encode(str))
+          );
         }
       }
     }

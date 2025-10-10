@@ -15,12 +15,12 @@ export function RpcContextProvider({ children }: Props) {
       value={useMemo(
         () => ({
           rpc: createSolanaRpc(solanaRpcUrl),
-          rpcEphemeral: createSolanaRpc("https://mainnet-tee.magicblock.app"),
+          rpcEphemeral: createSolanaRpc("http://localhost:7799"),
           rpcSubscriptions: createSolanaRpcSubscriptions(
             solanaRpcSubscriptionsUrl
           ),
           rpcSubscriptionsEphemeral: createSolanaRpcSubscriptions(
-            "wss://mainnet-tee.magicblock.app"
+            "ws://localhost:7800"
           ),
         }),
         [solanaRpcSubscriptionsUrl, solanaRpcUrl]

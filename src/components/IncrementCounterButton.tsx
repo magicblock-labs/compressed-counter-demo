@@ -13,7 +13,7 @@ type IncrementCounterButtonProps = Readonly<{
   payer: UiWalletAccount;
   rpc: Rpc<SolanaRpcApiMainnet>;
   rpcSubscriptions: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
-  disabled: boolean;
+  disabled?: boolean;
 }>;
 
 export function IncrementCounterButton({

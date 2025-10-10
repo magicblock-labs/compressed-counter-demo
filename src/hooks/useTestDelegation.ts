@@ -11,6 +11,7 @@ import {
   Rpc,
   RpcSubscriptions,
   sendAndConfirmTransactionFactory,
+  sendTransactionWithoutConfirmingFactory,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
   signAndSendTransactionMessageWithSigners,
@@ -25,6 +26,7 @@ import {
   getDelegateInstruction,
   getIncrementCounterInstruction,
   getUndelegateInstruction,
+  TEST_DELEGATION_PROGRAM_ADDRESS,
 } from "test-delegation";
 import { useWalletAccountTransactionSigner } from "@solana/react";
 import { useChain } from "./useChain";
@@ -138,7 +140,22 @@ export function useTestDelegation({
         )
     );
     console.log(message);
+    console.log(await rpc.getAccountInfo(counterPda).send());
     const signedTransaction = await signTransactionMessageWithSigners(message);
+
+    // const factory = sendTransactionWithoutConfirmingFactory({ rpc: rpc });
+    // console.log(
+    //   await factory(
+    //     {
+    //       signatures: signedTransaction.signatures,
+    //       messageBytes: signedTransaction.messageBytes,
+    //       "__transactionSignedness:@solana/kit": "fullySigned",
+    //       "__transactionSize:@solana/kit": "withinLimit",
+    //       // lifetimeConstraint: latestBlockhash,
+    //     },
+    //     { commitment: "finalized", skipPreflight: true }
+    //   )
+    // );
     await sendAndConfirmTransaction(
       {
         signatures: signedTransaction.signatures,
@@ -394,11 +411,12 @@ export function useTestDelegation({
     const systemAccountConfig = SystemAccountMetaConfig.new(
       new PublicKey(COMPRESSED_DELEGATION_PROGRAM_ADDRESS)
     );
-    let remainingAccounts =
+    let packedAccounts =
       PackedAccounts.newWithSystemAccountsSmall(systemAccountConfig);
+    console.log("remainingAccounts", packedAccounts);
 
     const packedTreeInfos = packTreeInfos(
-      remainingAccounts.toAccountMetas().remainingAccounts.map((a) => a.pubkey),
+      packedAccounts.toAccountMetas().remainingAccounts.map((a) => a.pubkey),
       [
         {
           hash: compressedDelegatedRecord.hash,
@@ -410,10 +428,10 @@ export function useTestDelegation({
       ],
       []
     );
-    const outputTreeIndex = remainingAccounts.insertOrGet(
+    const outputTreeIndex = packedAccounts.insertOrGet(
       compressedDelegatedRecord.treeInfo.tree
     );
-    const outputQueueIndex = remainingAccounts.insertOrGet(
+    const outputQueueIndex = packedAccounts.insertOrGet(
       compressedDelegatedRecord.treeInfo.queue
     );
     const accountMeta = {
@@ -424,7 +442,7 @@ export function useTestDelegation({
         leafIndex: compressedDelegatedRecord.leafIndex,
       },
       address: Array.from(delegatedRecordAddress.toBytes()),
-      outputStateTreeIndex: outputTreeIndex,
+      outputStateTreeIndex: outputQueueIndex,
       lamports: null,
     };
     const accountMetaBytes = serializeAccountMeta(accountMeta);
@@ -446,7 +464,7 @@ export function useTestDelegation({
           compressedDelegatedAccountBytes: compressedDelegatedRecord.data!.data,
         });
         ix.accounts.push(
-          ...remainingAccounts.toAccountMetas().remainingAccounts.map((a) => ({
+          ...packedAccounts.toAccountMetas().remainingAccounts.map((a) => ({
             address: address(a.pubkey.toString()),
             role: (a.isSigner && a.isWritable
               ? AccountRole.WRITABLE_SIGNER

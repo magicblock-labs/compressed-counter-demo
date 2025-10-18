@@ -1,8 +1,8 @@
 import { Button } from "@radix-ui/themes";
 import { UiWalletAccount } from "@wallet-standard/react";
 import { useCallback, useState } from "react";
-import { useTestDelegation } from "../hooks/useTestDelegation";
 import { useRpc } from "../hooks/useRpc";
+import { useCompressedDelegation } from "../hooks/useCompressedDelegation";
 
 type UndelegateButtonProps = Readonly<{
   payer: UiWalletAccount;
@@ -12,7 +12,7 @@ type UndelegateButtonProps = Readonly<{
 export function UndelegateButton({ payer, disabled }: UndelegateButtonProps) {
   const [isDelegating, setIsDelegating] = useState(false);
   const { rpc, rpcSubscriptions } = useRpc();
-  const { undelegateCounter } = useTestDelegation({
+  const { undelegateAccount } = useCompressedDelegation({
     payer,
     rpc,
     rpcSubscriptions,
@@ -21,14 +21,14 @@ export function UndelegateButton({ payer, disabled }: UndelegateButtonProps) {
   const handleUndelegateCounter = useCallback(async () => {
     setIsDelegating(true);
     try {
-      const signature = await undelegateCounter();
+      const signature = await undelegateAccount();
       console.log(signature);
     } catch (error) {
       console.error(error);
     } finally {
       setIsDelegating(false);
     }
-  }, [undelegateCounter]);
+  }, [undelegateAccount]);
 
   return (
     <Button

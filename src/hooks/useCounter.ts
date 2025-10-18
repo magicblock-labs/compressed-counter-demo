@@ -6,7 +6,7 @@ import {
   getCounterDecoder,
   TEST_DELEGATION_PROGRAM_ADDRESS,
 } from "test-delegation";
-import { getBase58Encoder } from "@solana/kit";
+import { Address, getBase58Encoder } from "@solana/kit";
 import { COMPRESSED_DELEGATION_PROGRAM_ADDRESS } from "compressed-delegation-program";
 
 export function useCounter() {
@@ -17,7 +17,8 @@ export function useCounter() {
   const [counterEphemeral, setCounterEphemeral] = useState<
     Counter | undefined
   >();
-  const [isDelegated, setIsDelegated] = useState(false);
+  const [mainnetOwner, setMainnetOwner] = useState<Address | undefined>();
+  const [ephemeralOwner, setEphemeralOwner] = useState<Address | undefined>();
 
   useEffect(() => {
     async function fetchCounter() {
@@ -32,18 +33,19 @@ export function useCounter() {
       if (accountInfo.value) {
         console.log("counter", accountInfo.value);
         if (accountInfo.value.owner === TEST_DELEGATION_PROGRAM_ADDRESS) {
-          setIsDelegated(false);
+          setMainnetOwner(TEST_DELEGATION_PROGRAM_ADDRESS);
           const str = getBase58Encoder().encode(accountInfo.value.data);
           console.log(str);
           setCounterMainnet(getCounterDecoder().decode(str));
         } else {
-          setIsDelegated(true);
+          setMainnetOwner(COMPRESSED_DELEGATION_PROGRAM_ADDRESS);
           accountInfo = await rpcEphemeral
             .getAccountInfo(counterPda, {
               commitment: "confirmed",
             })
             .send();
           if (accountInfo.value) {
+            setEphemeralOwner(accountInfo.value.owner);
             console.log("counter ephemeral", accountInfo.value);
             const str =
               typeof accountInfo.value.data === "string"
@@ -73,15 +75,14 @@ export function useCounter() {
       console.log(subscription);
       for await (const accountInfo of subscription) {
         console.log("mainnet accountInfo", accountInfo);
+        setMainnetOwner(accountInfo.value.owner);
         if (accountInfo.value?.data) {
           const str = getBase58Encoder().encode(accountInfo.value.data);
           console.log(str);
           setCounterMainnet(getCounterDecoder().decode(str));
-          setIsDelegated(false);
         } else if (
           accountInfo.value?.owner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS
         ) {
-          setIsDelegated(true);
         }
       }
     }
@@ -107,6 +108,7 @@ export function useCounter() {
       console.log(subscription);
       for await (const accountInfo of subscription) {
         console.log("ephem subscription", accountInfo);
+        setEphemeralOwner(accountInfo.value.owner);
         if (accountInfo.value?.data) {
           const str =
             typeof accountInfo.value.data === "string"
@@ -126,5 +128,5 @@ export function useCounter() {
     };
   }, [counterPda]);
 
-  return { counterMainnet, counterEphemeral, isDelegated };
+  return { counterMainnet, counterEphemeral, mainnetOwner, ephemeralOwner };
 }

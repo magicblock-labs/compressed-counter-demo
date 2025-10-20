@@ -38,9 +38,8 @@ export function ScheduleUndelegateButton({
       onClick={handleScheduleUndelegateCounter}
       loading={isDelegating}
       disabled={disabled}
-      style={{ height: "40px" }}
     >
-      Schedule Undelegate Counter
+      Schedule Undelegate
     </Button>
   );
 }

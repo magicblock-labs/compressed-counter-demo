@@ -74,7 +74,7 @@ export function useCounter() {
         .subscribe({ abortSignal: abortController.signal });
       console.log(subscription);
       for await (const accountInfo of subscription) {
-        console.log("mainnet accountInfo", accountInfo);
+        console.log("mainnet subscription", accountInfo);
         setMainnetOwner(accountInfo.value.owner);
         if (accountInfo.value?.data) {
           const str = getBase58Encoder().encode(accountInfo.value.data);

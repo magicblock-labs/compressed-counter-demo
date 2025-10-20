@@ -15,10 +15,10 @@ import { IncrementCounterButton } from "../components/IncrementCounterButton";
 import { useRpc } from "../hooks/useRpc";
 import { DelegateButton } from "../components/DelegateButton";
 import { UndelegateButton } from "../components/UndelegateButton";
-import { FundEscrowButton } from "../components/FundEscrowButton";
 import { COMPRESSED_DELEGATION_PROGRAM_ADDRESS } from "compressed-delegation-program";
 import { ScheduleUndelegateButton } from "../components/ScheduleUndelegateButton";
 import { DELEGATION_PROGRAM_ADDRESS } from "../constants";
+import { TEST_DELEGATION_PROGRAM_ADDRESS } from "test-delegation";
 
 function Root() {
   const [selectedWalletAccount] = useSelectedWallet();
@@ -54,24 +54,22 @@ function Root() {
                     payer={selectedWalletAccount}
                     rpc={rpc}
                     rpcSubscriptions={rpcSubscriptions}
-                    // disabled={isDelegated}
+                    disabled={mainnetOwner !== TEST_DELEGATION_PROGRAM_ADDRESS}
                   />
-                  <DelegateButton
-                    payer={selectedWalletAccount}
-                    disabled={
-                      mainnetOwner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS
-                    }
-                  />
-                  <UndelegateButton
-                    payer={selectedWalletAccount}
-                    disabled={
-                      !(
-                        ephemeralOwner ===
-                          DELEGATION_PROGRAM_ADDRESS.toString() &&
-                        mainnetOwner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS
-                      )
-                    }
-                  />
+                  {mainnetOwner === TEST_DELEGATION_PROGRAM_ADDRESS ? (
+                    <DelegateButton payer={selectedWalletAccount} />
+                  ) : (
+                    <UndelegateButton
+                      payer={selectedWalletAccount}
+                      disabled={
+                        !(
+                          ephemeralOwner ===
+                            DELEGATION_PROGRAM_ADDRESS.toString() &&
+                          mainnetOwner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS
+                        )
+                      }
+                    />
+                  )}
                 </Flex>
               </Card>
             </Box>
@@ -86,19 +84,18 @@ function Root() {
                     payer={selectedWalletAccount}
                     rpc={rpcEphemeral}
                     rpcSubscriptions={rpcSubscriptionsEphemeral}
-                    // disabled={!isDelegated}
+                    disabled={mainnetOwner === TEST_DELEGATION_PROGRAM_ADDRESS}
                   />
                   <ScheduleUndelegateButton
                     payer={selectedWalletAccount}
                     disabled={
-                      ephemeralOwner === DELEGATION_PROGRAM_ADDRESS.toString()
+                      ephemeralOwner !== TEST_DELEGATION_PROGRAM_ADDRESS
                     }
                   />
                 </Flex>
               </Card>
             </Box>
           </Grid>
-          <FundEscrowButton payer={selectedWalletAccount} />
           {!counterMainnet &&
             mainnetOwner !== COMPRESSED_DELEGATION_PROGRAM_ADDRESS && (
               <CreateCounterButton payer={selectedWalletAccount} />

@@ -6,7 +6,7 @@ import { useRpc } from "../hooks/useRpc";
 
 type DelegateButtonProps = Readonly<{
   payer: UiWalletAccount;
-  disabled: boolean;
+  disabled?: boolean;
 }>;
 
 export function DelegateButton({ payer, disabled }: DelegateButtonProps) {

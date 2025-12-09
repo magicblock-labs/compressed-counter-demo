@@ -1,3 +1,5 @@
+packages:
+  - 'clients/*'
 ignoredBuiltDependencies:
   - '@swc/core'
   - esbuild

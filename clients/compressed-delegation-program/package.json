@@ -1,0 +1,46 @@
+{
+  "name": "compressed-delegation-program",
+  "version": "0.1.0",
+  "description": "Compressed Delegation Program",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rimraf dist && tsc -p tsconfig.json",
+    "build:docs": "typedoc",
+    "test": "ava",
+    "bench": "rm -f output.json && ava ./dist/bench/*.js --serial --no-worker-threads",
+    "lint": "eslint --ext js,ts,tsx src",
+    "lint:fix": "eslint --fix --ext js,ts,tsx src",
+    "format": "prettier --check src test",
+    "format:fix": "prettier --write src test"
+  },
+  "files": [
+    "/dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@lightprotocol/stateless.js": "^0.22.0",
+    "@solana/kit": "^3.0.3",
+    "borsh": "^2.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^8.10.2",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^4.2.5",
+    "prettier": "^3.6.2",
+    "rimraf": "^3.0.2",
+    "typedoc": "^0.23.28",
+    "typedoc-plugin-expand-object-like-types": "^0.1.2",
+    "typedoc-plugin-missing-exports": "^1.0.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.2.0"
+}

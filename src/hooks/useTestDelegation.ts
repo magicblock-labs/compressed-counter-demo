@@ -28,10 +28,7 @@ import { useWalletAccountTransactionSigner } from "@solana/react";
 import { useChain } from "./useChain";
 import { UiWalletAccount } from "@wallet-standard/react";
 import { useCounterPda } from "./useCounterPda";
-import {
-  COMPRESSED_DELEGATION_CPI_SIGNER,
-  COMPRESSED_DELEGATION_PROGRAM_ADDRESS,
-} from "compressed-delegation-program";
+import { COMPRESSED_DELEGATION_PROGRAM_ADDRESS } from "compressed-delegation-program";
 import {
   bn,
   deriveAddressSeedV2,
@@ -128,6 +125,7 @@ export function useTestDelegation({
         appendTransactionMessageInstruction(
           getIncrementCounterInstruction({
             counter: counterPda,
+            authority: signer,
           }),
           m
         )
@@ -207,7 +205,6 @@ export function useTestDelegation({
         payer: signer,
         counter: counterPda,
         compressedDelegationProgram: COMPRESSED_DELEGATION_PROGRAM_ADDRESS,
-        compressedDelegationCpiSigner: COMPRESSED_DELEGATION_CPI_SIGNER,
         args: {
           validator: VALIDATOR,
           validityProof,
@@ -276,7 +273,6 @@ export function useTestDelegation({
         payer: signer,
         counter: counterPda,
         compressedDelegationProgram: COMPRESSED_DELEGATION_PROGRAM_ADDRESS,
-        compressedDelegationCpiSigner: COMPRESSED_DELEGATION_CPI_SIGNER,
         args: {
           validator: VALIDATOR,
           validityProof,

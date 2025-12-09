@@ -14,6 +14,7 @@ import {
   getU64Encoder,
   transformEncoder,
   type AccountMeta,
+  type AccountSignerMeta,
   type Address,
   type FixedSizeCodec,
   type FixedSizeDecoder,
@@ -21,7 +22,9 @@ import {
   type Instruction,
   type InstructionWithAccounts,
   type InstructionWithData,
+  type ReadonlySignerAccount,
   type ReadonlyUint8Array,
+  type TransactionSigner,
   type WritableAccount,
 } from '@solana/kit';
 import { TEST_DELEGATION_PROGRAM_ADDRESS } from '../programs';
@@ -36,6 +39,7 @@ export function getIncrementCounterDiscriminatorBytes() {
 export type IncrementCounterInstruction<
   TProgram extends string = typeof TEST_DELEGATION_PROGRAM_ADDRESS,
   TAccountCounter extends string | AccountMeta<string> = string,
+  TAccountAuthority extends string | AccountMeta<string> = string,
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
 > = Instruction<TProgram> &
   InstructionWithData<ReadonlyUint8Array> &
@@ -44,6 +48,10 @@ export type IncrementCounterInstruction<
       TAccountCounter extends string
         ? WritableAccount<TAccountCounter>
         : TAccountCounter,
+      TAccountAuthority extends string
+        ? ReadonlySignerAccount<TAccountAuthority> &
+            AccountSignerMeta<TAccountAuthority>
+        : TAccountAuthority,
       ...TRemainingAccounts,
     ]
   >;
@@ -73,17 +81,26 @@ export function getIncrementCounterInstructionDataCodec(): FixedSizeCodec<
   );
 }
 
-export type IncrementCounterInput<TAccountCounter extends string = string> = {
+export type IncrementCounterInput<
+  TAccountCounter extends string = string,
+  TAccountAuthority extends string = string,
+> = {
   counter: Address<TAccountCounter>;
+  authority: TransactionSigner<TAccountAuthority>;
 };
 
 export function getIncrementCounterInstruction<
   TAccountCounter extends string,
+  TAccountAuthority extends string,
   TProgramAddress extends Address = typeof TEST_DELEGATION_PROGRAM_ADDRESS,
 >(
-  input: IncrementCounterInput<TAccountCounter>,
+  input: IncrementCounterInput<TAccountCounter, TAccountAuthority>,
   config?: { programAddress?: TProgramAddress }
-): IncrementCounterInstruction<TProgramAddress, TAccountCounter> {
+): IncrementCounterInstruction<
+  TProgramAddress,
+  TAccountCounter,
+  TAccountAuthority
+> {
   // Program address.
   const programAddress =
     config?.programAddress ?? TEST_DELEGATION_PROGRAM_ADDRESS;
@@ -91,6 +108,7 @@ export function getIncrementCounterInstruction<
   // Original accounts.
   const originalAccounts = {
     counter: { value: input.counter ?? null, isWritable: true },
+    authority: { value: input.authority ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
     keyof typeof originalAccounts,
@@ -99,10 +117,17 @@ export function getIncrementCounterInstruction<
 
   const getAccountMeta = getAccountMetaFactory(programAddress, 'programId');
   return Object.freeze({
-    accounts: [getAccountMeta(accounts.counter)],
+    accounts: [
+      getAccountMeta(accounts.counter),
+      getAccountMeta(accounts.authority),
+    ],
     data: getIncrementCounterInstructionDataEncoder().encode({}),
     programAddress,
-  } as IncrementCounterInstruction<TProgramAddress, TAccountCounter>);
+  } as IncrementCounterInstruction<
+    TProgramAddress,
+    TAccountCounter,
+    TAccountAuthority
+  >);
 }
 
 export type ParsedIncrementCounterInstruction<
@@ -112,6 +137,7 @@ export type ParsedIncrementCounterInstruction<
   programAddress: Address<TProgram>;
   accounts: {
     counter: TAccountMetas[0];
+    authority: TAccountMetas[1];
   };
   data: IncrementCounterInstructionData;
 };
@@ -124,7 +150,7 @@ export function parseIncrementCounterInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>
 ): ParsedIncrementCounterInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 1) {
+  if (instruction.accounts.length < 2) {
     // TODO: Coded error.
     throw new Error('Not enough accounts');
   }
@@ -136,7 +162,7 @@ export function parseIncrementCounterInstruction<
   };
   return {
     programAddress: instruction.programAddress,
-    accounts: { counter: getNextAccount() },
+    accounts: { counter: getNextAccount(), authority: getNextAccount() },
     data: getIncrementCounterInstructionDataDecoder().decode(instruction.data),
   };
 }

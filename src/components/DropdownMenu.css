@@ -1,0 +1,60 @@
+/* Dropdown Menu */
+[class*="rt-DropdownMenuContent"] {
+  background: rgba(30, 41, 59, 0.98);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.25);
+  animation: fadeIn 0.2s ease-out;
+  color: rgba(226, 232, 240, 0.95);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[class*="rt-DropdownMenuItem"] {
+  transition: all 0.2s;
+}
+
+[class*="rt-DropdownMenuItem"]:hover {
+  background: var(--gradient-primary);
+  color: rgba(255, 255, 255, 0.95) !important;
+  transform: translateX(5px);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+}
+
+/* Ensure DropdownMenu trigger button doesn't override Badge styles */
+[class*="rt-DropdownMenuTrigger"] button,
+[class*="rt-DropdownMenuTrigger"] button:hover {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+[class*="rt-DropdownMenuTrigger"] [class*="rt-Badge"],
+[class*="rt-DropdownMenuTrigger"] [class*="rt-Badge"]:hover,
+[class*="rt-DropdownMenuTrigger"] [class*="rt-Badge"] *,
+[class*="rt-DropdownMenuTrigger"] [class*="rt-Badge"]:hover *,
+button:hover [class*="rt-Badge"],
+button [class*="rt-Badge"]:hover,
+button:hover [class*="rt-Badge"] *,
+button [class*="rt-Badge"]:hover * {
+  color: white !important;
+  background: var(--gradient-primary) !important;
+}
+
+[class*="rt-DropdownMenuTrigger"] button [class*="rt-Badge"],
+[class*="rt-DropdownMenuTrigger"] button:hover [class*="rt-Badge"],
+[class*="rt-DropdownMenuTrigger"] button [class*="rt-Badge"] *,
+[class*="rt-DropdownMenuTrigger"] button:hover [class*="rt-Badge"] * {
+  color: white !important;
+  background: var(--gradient-primary) !important;
+}
+

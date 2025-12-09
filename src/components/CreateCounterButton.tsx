@@ -26,7 +26,17 @@ export function CreateCounterButton({ payer }: CreateCounterButtonProps) {
   }, [createCounter]);
 
   return (
-    <Button onClick={handleCreateCounter} loading={isCreatingCounter}>
+    <Button 
+      onClick={handleCreateCounter} 
+      loading={isCreatingCounter}
+      size="3"
+      style={{
+        background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        fontSize: '1rem',
+        padding: '1rem 2rem',
+        fontWeight: 700,
+      }}
+    >
       Create Counter
     </Button>
   );

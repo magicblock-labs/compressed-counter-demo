@@ -14,6 +14,7 @@ import { ConnectWalletMenuItem } from "./ConnectWalletMenuItem";
 import { ErrorDialog } from "./ErrorDialog";
 import { UnconnectableWalletMenuItem } from "./UnconnectableWalletMenuItem";
 import { WalletAccountIcon } from "./WalletAccountIcon";
+import "./DropdownMenu.css";
 
 type Props = Readonly<{
   children: React.ReactNode;

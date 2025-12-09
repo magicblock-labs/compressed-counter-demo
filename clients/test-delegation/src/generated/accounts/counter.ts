@@ -13,6 +13,8 @@ import {
   decodeAccount,
   fetchEncodedAccount,
   fetchEncodedAccounts,
+  getAddressDecoder,
+  getAddressEncoder,
   getStructDecoder,
   getStructEncoder,
   getU64Decoder,
@@ -28,17 +30,24 @@ import {
   type MaybeAccount,
   type MaybeEncodedAccount,
 } from '@solana/kit';
+import { CounterSeeds, findCounterPda } from '../pdas';
 
-export type Counter = { counter: bigint };
+export type Counter = { authority: Address; counter: bigint };
 
-export type CounterArgs = { counter: number | bigint };
+export type CounterArgs = { authority: Address; counter: number | bigint };
 
 export function getCounterEncoder(): FixedSizeEncoder<CounterArgs> {
-  return getStructEncoder([['counter', getU64Encoder()]]);
+  return getStructEncoder([
+    ['authority', getAddressEncoder()],
+    ['counter', getU64Encoder()],
+  ]);
 }
 
 export function getCounterDecoder(): FixedSizeDecoder<Counter> {
-  return getStructDecoder([['counter', getU64Decoder()]]);
+  return getStructDecoder([
+    ['authority', getAddressDecoder()],
+    ['counter', getU64Decoder()],
+  ]);
 }
 
 export function getCounterCodec(): FixedSizeCodec<CounterArgs, Counter> {
@@ -96,4 +105,24 @@ export async function fetchAllMaybeCounter(
 ): Promise<MaybeAccount<Counter>[]> {
   const maybeAccounts = await fetchEncodedAccounts(rpc, addresses, config);
   return maybeAccounts.map((maybeAccount) => decodeCounter(maybeAccount));
+}
+
+export async function fetchCounterFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: CounterSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {}
+): Promise<Account<Counter>> {
+  const maybeAccount = await fetchMaybeCounterFromSeeds(rpc, seeds, config);
+  assertAccountExists(maybeAccount);
+  return maybeAccount;
+}
+
+export async function fetchMaybeCounterFromSeeds(
+  rpc: Parameters<typeof fetchEncodedAccount>[0],
+  seeds: CounterSeeds,
+  config: FetchAccountConfig & { programAddress?: Address } = {}
+): Promise<MaybeAccount<Counter>> {
+  const { programAddress, ...fetchConfig } = config;
+  const [address] = await findCounterPda(seeds, { programAddress });
+  return await fetchMaybeCounter(rpc, address, fetchConfig);
 }

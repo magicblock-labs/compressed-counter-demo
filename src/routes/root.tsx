@@ -19,6 +19,8 @@ import { COMPRESSED_DELEGATION_PROGRAM_ADDRESS } from "compressed-delegation-pro
 import { ScheduleUndelegateButton } from "../components/ScheduleUndelegateButton";
 import { DELEGATION_PROGRAM_ADDRESS } from "../constants";
 import { TEST_DELEGATION_PROGRAM_ADDRESS } from "test-delegation";
+import "../components/Card.css";
+import "./Counter.css";
 
 function Root() {
   const [selectedWalletAccount] = useSelectedWallet();
@@ -43,7 +45,13 @@ function Root() {
             m="auto"
             gap="4"
           >
-            <Box maxWidth="240px" m="auto">
+            <Box
+              maxWidth="240px"
+              m="auto"
+              style={{
+                animation: "fadeInUp 0.6s ease-out 0.1s both",
+              }}
+            >
               <Card size="2">
                 <Flex direction="column" justify="center" gap="2">
                   <Heading align="center">Onchain</Heading>
@@ -73,7 +81,13 @@ function Root() {
                 </Flex>
               </Card>
             </Box>
-            <Box maxWidth="240px" m="auto">
+            <Box
+              maxWidth="240px"
+              m="auto"
+              style={{
+                animation: "fadeInUp 0.6s ease-out 0.2s both",
+              }}
+            >
               <Card size="2">
                 <Flex direction="column" justify="center" gap="2">
                   <Heading align="center">Delegated</Heading>
@@ -102,7 +116,27 @@ function Root() {
             )}
         </Flex>
       ) : (
-        <Text as="p">Click &ldquo;Connect Wallet&rdquo; to get started.</Text>
+        <Flex
+          direction="column"
+          align="center"
+          gap="4"
+          style={{ marginTop: "4rem" }}
+        >
+          <Text
+            as="p"
+            size="5"
+            weight="medium"
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+              animation: "fadeInUp 0.8s ease-out",
+            }}
+          >
+            Click &ldquo;Connect Wallet&rdquo; to get started.
+          </Text>
+        </Flex>
       )}
     </Container>
   );

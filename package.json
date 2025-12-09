@@ -4,7 +4,10 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "preinstall": "pnpm --filter compressed-delegation-program install --ignore-scripts && pnpm --filter compressed-delegation-program exec rimraf dist && pnpm --filter compressed-delegation-program exec tsc -p tsconfig.json && pnpm --filter test-counter install --ignore-scripts && pnpm --filter test-counter exec rimraf dist && pnpm --filter test-counter exec tsc -p tsconfig.json",
+        "preinstall": "pnpm build:clients",
+        "build:clients": "pnpm build:counter && pnpm build:delegation",
+        "build:counter": "pnpm --filter test-delegation install --ignore-scripts && pnpm --filter test-delegation exec rimraf dist && pnpm --filter test-delegation exec tsc -p tsconfig.json",
+        "build:delegation": "pnpm --filter compressed-delegation-program install --ignore-scripts && pnpm --filter compressed-delegation-program exec rimraf dist && pnpm --filter compressed-delegation-program exec tsc -p tsconfig.json",
         "dev": "vite",
         "compile:js": "vite build",
         "preview": "vite preview",
@@ -31,7 +34,7 @@
         "react-dom": "^19.2.0",
         "react-error-boundary": "^5.0.0",
         "swr": "^2.3.6",
-        "test-counter": "file:clients/test-counter"
+        "test-delegation": "file:clients/test-delegation"
     },
     "devDependencies": {
         "@solana/wallet-standard-features": "^1.3.0",

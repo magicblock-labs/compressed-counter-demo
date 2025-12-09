@@ -1,1 +1,299 @@
-@import './reset.css';
+@import "./reset.css";
+
+/* ============================================
+   Global Styles & Gradients
+   ============================================ */
+
+:root {
+  --gradient-primary: linear-gradient(
+    135deg,
+    #7c3aed 0%,
+    #5b21b6 50%,
+    #4a5568 100%
+  );
+  --gradient-secondary: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  --gradient-accent: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+  --gradient-success: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+  --gradient-warning: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+  --gradient-dark: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  --gradient-bg: linear-gradient(135deg, #2d3748 0%, #4a5568 50%, #6b7280 100%);
+  --gradient-bg-subtle: linear-gradient(135deg, #4a5568 0%, #6b7280 100%);
+
+  --shadow-sm: 0 1px 2px rgba(124, 58, 237, 0.2);
+  --shadow-md: 0 2px 4px rgba(124, 58, 237, 0.25);
+  --shadow-lg: 0 4px 8px rgba(124, 58, 237, 0.3);
+  --shadow-xl: 0 8px 16px rgba(124, 58, 237, 0.4);
+  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.5);
+}
+
+/* Override Radix Theme background colors to show gradient */
+html,
+html[data-theme],
+html[data-theme="dark"] {
+  background: transparent !important;
+}
+
+body {
+  background-image: radial-gradient(
+    ellipse 140% 100% at 50% 0%,
+    #7c3aed 0%,
+    #6b21a8 15%,
+    #4a5568 35%,
+    #2d3748 55%,
+    #1e293b 75%,
+    #1a202c 100%
+  ) !important;
+  background-color: transparent !important;
+  background-attachment: fixed;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Override Radix Theme wrapper backgrounds */
+[class*="rt-Theme"],
+[class*="rt-Theme-Root"],
+#root {
+  background: transparent !important;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse 90% 70% at 50% 25%,
+    rgba(139, 92, 246, 0.3) 0%,
+    rgba(124, 58, 237, 0.2) 30%,
+    rgba(107, 114, 128, 0.1) 60%,
+    transparent 100%
+  );
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* ============================================
+   Enhanced Buttons
+   ============================================ */
+
+/* Universal button styles - more reliable selectors */
+button,
+button[data-radix-collection-item],
+button[class*="rt-Button"],
+button[class*="Button"] {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px !important;
+  text-transform: uppercase !important;
+  font-size: 0.875rem !important;
+  box-shadow: var(--shadow-md) !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+
+button:not(:disabled):hover,
+button[data-radix-collection-item]:not(:disabled):hover,
+button[class*="rt-Button"]:not(:disabled):hover,
+button[class*="Button"]:not(:disabled):hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25) !important;
+}
+
+button[data-radix-collection-item]:not(:disabled):active,
+button[class*="rt-Button"]:not(:disabled):active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+button[data-radix-collection-item]:disabled,
+button[class*="rt-Button"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Primary Button Gradient - apply to all solid buttons by default */
+button[class*="rt-Button"][class*="rt-r-variant-solid"]:not(
+    [class*="rt-r-color-red"]
+  ):not([class*="rt-r-color-amber"]):not([class*="rt-r-color-orange"]):not(
+    .chain-badge-trigger
+  ),
+button[class*="Button"][class*="variant-solid"]:not(.chain-badge-trigger) {
+  background: var(--gradient-primary) !important;
+  color: white !important;
+  border: none !important;
+}
+
+button[class*="rt-Button"][class*="rt-r-variant-solid"]:not(
+    [class*="rt-r-color-red"]
+  ):not([class*="rt-r-color-amber"]):not([class*="rt-r-color-orange"]):not(
+    .chain-badge-trigger
+  )::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+button[class*="rt-Button"][class*="rt-r-variant-solid"]:not(
+    [class*="rt-r-color-red"]
+  ):not([class*="rt-r-color-amber"]):not([class*="rt-r-color-orange"]):not(
+    .chain-badge-trigger
+  ):hover::before {
+  left: 100%;
+}
+
+/* Loading Button Animation */
+button[class*="rt-Button"][data-state="loading"] {
+  position: relative;
+}
+
+button[class*="rt-Button"][data-state="loading"]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   Badge Enhancements (Global)
+   ============================================ */
+/* 
+[class*="rt-Badge"] {
+  background: var(--gradient-accent);
+  color: white !important;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s;
+}
+
+[class*="rt-Badge"]:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+  color: white !important;
+} */
+
+/* ============================================
+   Container & Layout
+   ============================================ */
+
+[class*="rt-Container"] {
+  animation: fadeIn 0.8s ease-out;
+}
+
+[class*="rt-Section"] {
+  padding: 2rem 0;
+  min-height: calc(100vh - 80px);
+  background: transparent !important;
+}
+
+/* Ensure Flex containers don't block gradient */
+[class*="rt-Flex"]:not([class*="rt-Card"]):not([style*="background"]) {
+  background: transparent !important;
+}
+
+/* ============================================
+   Text Enhancements
+   ============================================ */
+
+[class*="rt-Text"] {
+  color: rgba(226, 232, 240, 0.95);
+  line-height: 1.6;
+}
+
+/* ============================================
+   Grid Enhancements
+   ============================================ */
+
+[class*="rt-Grid"] {
+  gap: 2rem;
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+
+@media (max-width: 768px) {
+  button[class*="rt-Button"]:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+}
+
+/* ============================================
+   Button Variants - Enhanced Colors
+   ============================================ */
+
+/* All primary buttons get gradient, specific colors can be added via inline styles if needed */
+
+/* ============================================
+   Flex Container Enhancements
+   ============================================ */
+
+[class*="rt-Flex"][direction="column"] {
+  gap: 1rem;
+}
+
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(45, 55, 72, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gradient-secondary);
+}
+
+/* ============================================
+   Additional Polish
+   ============================================ */
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Focus states for accessibility */
+button:focus-visible {
+  outline: 2px solid rgba(124, 58, 237, 0.8);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

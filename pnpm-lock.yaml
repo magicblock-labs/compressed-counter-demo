@@ -59,9 +59,9 @@ importers:
       swr:
         specifier: ^2.3.6
         version: 2.3.6(react@19.2.0)
-      test-counter:
-        specifier: file:clients/test-counter
-        version: link:clients/test-counter
+      test-delegation:
+        specifier: file:clients/test-delegation
+        version: link:clients/test-delegation
     devDependencies:
       '@solana/wallet-standard-features':
         specifier: ^1.3.0
@@ -140,7 +140,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  clients/test-counter:
+  clients/test-delegation:
     dependencies:
       '@lightprotocol/stateless.js':
         specifier: ^0.22.0

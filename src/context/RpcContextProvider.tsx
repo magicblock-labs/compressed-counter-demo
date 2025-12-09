@@ -3,7 +3,6 @@ import { ReactNode, useContext, useMemo } from "react";
 
 import { ChainContext } from "./ChainContext";
 import { RpcContext } from "./RpcContext";
-import { EPHEMERAL_PORT } from "../constants";
 
 type Props = Readonly<{
   children: ReactNode;
@@ -16,12 +15,12 @@ export function RpcContextProvider({ children }: Props) {
       value={useMemo(
         () => ({
           rpc: createSolanaRpc(solanaRpcUrl),
-          rpcEphemeral: createSolanaRpc(`http://localhost:${EPHEMERAL_PORT}`),
+          rpcEphemeral: createSolanaRpc(`https://testnet-as.magicblock.app`),
           rpcSubscriptions: createSolanaRpcSubscriptions(
             solanaRpcSubscriptionsUrl
           ),
           rpcSubscriptionsEphemeral: createSolanaRpcSubscriptions(
-            `ws://localhost:${EPHEMERAL_PORT + 1}`
+            `wss://testnet-as.magicblock.app`
           ),
         }),
         [solanaRpcSubscriptionsUrl, solanaRpcUrl]

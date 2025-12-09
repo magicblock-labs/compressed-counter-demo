@@ -1,0 +1,87 @@
+/* Enhanced Cards */
+[class*="rt-Card"],
+[class*="Card"],
+div[class*="Card"] {
+  background: rgba(30, 41, 59, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(124, 58, 237, 0.3) !important;
+  box-shadow: 0 2px 4px rgba(124, 58, 237, 0.15) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  color: rgba(226, 232, 240, 0.95) !important;
+}
+
+/* Apply animation to cards */
+[class*="rt-Card"]:not([style*="animation"]) {
+  animation: fadeInUp 0.6s ease-out !important;
+  animation-fill-mode: both !important;
+}
+
+/* Box animations - inline styles will override */
+[class*="rt-Box"]:not([style*="animation"]) {
+  animation: fadeInUp 0.6s ease-out !important;
+  animation-fill-mode: both !important;
+}
+
+[class*="rt-Card"]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-primary);
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: -1;
+}
+
+[class*="rt-Card"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.25);
+  border-color: rgba(124, 58, 237, 0.5) !important;
+}
+
+[class*="rt-Card"]:hover::before {
+  opacity: 0.2;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure elements with fadeInUp animation start hidden */
+[style*="fadeInUp"] {
+  opacity: 0;
+  animation-fill-mode: both;
+}
+
+/* Card Headings */
+[class*="rt-Card"] [class*="rt-Heading"]:not([class*="rt-r-size-8"]) {
+  background: linear-gradient(135deg, #e9d5ff 0%, #c4b5fd 50%, #e2e8f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+/* Subtle glow effect on hover for cards */
+[class*="rt-Card"]:hover [class*="rt-Heading"][class*="rt-r-size-8"] {
+  filter: drop-shadow(0 0 4px rgba(124, 58, 237, 0.5));
+}
+
+@media (max-width: 768px) {
+  [class*="rt-Card"]:hover {
+    transform: translateY(-1px);
+  }
+}
+

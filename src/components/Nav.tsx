@@ -3,7 +3,8 @@ import { useContext } from "react";
 
 import { ChainContext } from "../context/ChainContext";
 import { ConnectWalletMenu } from "./ConnectWalletMenu";
-// import { SignInMenu } from "./SignInMenu";
+import "./Nav.css";
+import "./DropdownMenu.css";
 
 export function Nav() {
   const {
@@ -11,11 +12,6 @@ export function Nav() {
     chain,
     setChain,
   } = useContext(ChainContext);
-  const currentChainBadge = (
-    <Badge color="gray" style={{ verticalAlign: "middle" }}>
-      {currentChainName}
-    </Badge>
-  );
   return (
     <Box
       style={{
@@ -33,7 +29,11 @@ export function Nav() {
             Compressed Ephemeral Counter{" "}
             {setChain ? (
               <DropdownMenu.Root>
-                <DropdownMenu.Trigger>{currentChainBadge}</DropdownMenu.Trigger>
+                <DropdownMenu.Trigger>
+                  <Badge color="gray" style={{ verticalAlign: "middle" }}>
+                    {currentChainName}
+                  </Badge>
+                </DropdownMenu.Trigger>
                 <DropdownMenu.Content>
                   <DropdownMenu.RadioGroup
                     onValueChange={(value) => {
@@ -49,14 +49,16 @@ export function Nav() {
                     <DropdownMenu.RadioItem value="solana:devnet">
                       Devnet
                     </DropdownMenu.RadioItem>
-                    <DropdownMenu.RadioItem value="solana:testnet">
-                      Testnet
+                    <DropdownMenu.RadioItem value="solana:localhost">
+                      Localhost
                     </DropdownMenu.RadioItem>
                   </DropdownMenu.RadioGroup>
                 </DropdownMenu.Content>
               </DropdownMenu.Root>
             ) : (
-              currentChainBadge
+              <Badge color="gray" style={{ verticalAlign: "middle" }}>
+                {currentChainName}
+              </Badge>
             )}
           </Heading>
         </Box>

@@ -29,7 +29,6 @@ import {
   deriveAddressSeedV2,
   deriveAddressV2,
   packTreeInfos,
-  TreeType,
 } from "@lightprotocol/stateless.js";
 import { ComputeBudgetProgram, PublicKey } from "@solana/web3.js";
 
@@ -40,7 +39,6 @@ import {
 } from "./usePhoton";
 import { SYSTEM_PROGRAM_ADDRESS } from "@solana-program/system";
 import { TEST_DELEGATION_PROGRAM_ADDRESS } from "test-delegation";
-import { ADDRESS_TREE, OUTPUT_QUEUE } from "../constants";
 
 type UseCompressedDelegationProps = Readonly<{
   payer: UiWalletAccount;
@@ -67,11 +65,7 @@ export function useCompressedDelegation({
       throw new Error("Payer or counter not found");
     }
 
-    const addressTree = {
-      tree: ADDRESS_TREE,
-      queue: OUTPUT_QUEUE,
-      tree_type: TreeType.AddressV2,
-    };
+    const addressTree = await photonRpc.getAddressTreeInfoV2();
     const encodedCounterPda = getBase58Encoder().encode(counterPda);
     const addressSeed = deriveAddressSeedV2([
       new Uint8Array(encodedCounterPda),

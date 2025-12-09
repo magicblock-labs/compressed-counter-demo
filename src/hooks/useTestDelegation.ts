@@ -125,6 +125,12 @@ export function useTestDelegation({
     const counterInfo = (await rpc.getAccountInfo(counterPda).send()).value;
 
     const addressTree = await photonRpc.getAddressTreeInfoV2();
+    addressTree.queue = OUTPUT_QUEUE;
+    console.log("addressTree", addressTree);
+    console.log("addressTree.tree", addressTree.tree.toString());
+    console.log("addressTree.queue", addressTree.queue.toString());
+    console.log(ADDRESS_TREE.toString());
+    console.log(OUTPUT_QUEUE.toString());
     const encodedCounterPda = getBase58Encoder().encode(counterPda);
     const addressSeed = deriveAddressSeedV2([
       new Uint8Array(encodedCounterPda),
@@ -157,10 +163,12 @@ export function useTestDelegation({
       );
 
       // Insert trees in accounts
-      const addressMerkleTreePubkeyIndex =
-        remainingAccounts.insertOrGet(ADDRESS_TREE);
-      const addressQueuePubkeyIndex =
-        remainingAccounts.insertOrGet(OUTPUT_QUEUE);
+      const addressMerkleTreePubkeyIndex = remainingAccounts.insertOrGet(
+        addressTree.tree
+      );
+      const addressQueuePubkeyIndex = remainingAccounts.insertOrGet(
+        addressTree.queue
+      );
 
       const validityProof = result.compressedProof;
 

@@ -4,6 +4,7 @@ import "@radix-ui/themes/styles.css";
 import { Flex, Section, Theme } from "@radix-ui/themes";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { Toaster } from "sonner";
 
 import { Nav } from "./components/Nav.tsx";
 import { ChainContextProvider } from "./context/ChainContextProvider.tsx";
@@ -21,12 +22,15 @@ root.render(
       <ChainContextProvider>
         <SelectedWalletAccountContextProvider>
           <RpcContextProvider>
-            <Flex direction="column">
+            <Flex direction="column" style={{ minHeight: "100vh" }}>
               <Nav />
-              <Section>
+              <Section
+                style={{ flex: 1, display: "flex", flexDirection: "column" }}
+              >
                 <Root />
               </Section>
             </Flex>
+            <Toaster position="top-right" />
           </RpcContextProvider>
         </SelectedWalletAccountContextProvider>
       </ChainContextProvider>

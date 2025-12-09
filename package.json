@@ -33,6 +33,7 @@
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
         "react-error-boundary": "^5.0.0",
+        "sonner": "^2.0.7",
         "swr": "^2.3.6",
         "test-delegation": "file:clients/test-delegation"
     },

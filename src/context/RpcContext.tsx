@@ -10,6 +10,7 @@ import {
   devnet,
 } from "@solana/kit";
 import { createContext } from "react";
+import { DEVNET_PORT, EPHEMERAL_PORT } from "../constants";
 
 export const RpcContext = createContext<{
   rpc: Rpc<SolanaRpcApiMainnet>; // Limit the API to only those methods found on Mainnet (ie. not `requestAirdrop`)
@@ -17,10 +18,12 @@ export const RpcContext = createContext<{
   rpcSubscriptions: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
   rpcSubscriptionsEphemeral: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
 }>({
-  rpc: createSolanaRpc("http://localhost:8899"),
-  rpcEphemeral: createSolanaRpc(devnet("http://localhost:7799")),
-  rpcSubscriptions: createSolanaRpcSubscriptions(devnet("ws://localhost:8900")),
+  rpc: createSolanaRpc(`http://localhost:${DEVNET_PORT}`),
+  rpcEphemeral: createSolanaRpc(devnet(`http://localhost:${EPHEMERAL_PORT}`)),
+  rpcSubscriptions: createSolanaRpcSubscriptions(
+    devnet(`ws://localhost:${DEVNET_PORT + 1}`)
+  ),
   rpcSubscriptionsEphemeral: createSolanaRpcSubscriptions(
-    devnet("ws://localhost:7800")
+    devnet(`ws://localhost:${EPHEMERAL_PORT + 1}`)
   ),
 });

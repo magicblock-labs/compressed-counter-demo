@@ -1,11 +1,14 @@
 import { address } from "@solana/kit";
 import { PublicKey } from "@solana/web3.js";
 
+export const DEVNET_PORT = 7799;
+export const EPHEMERAL_PORT = 8899;
+
 export const ADDRESS_TREE = new PublicKey(
-  "EzKE84aVTkCUhDHLELqyJaq1Y7UVVmqxXqZjVHwHY3rK"
+  "amt2kaJA14v3urZbZvnc5v2np8jqvc4Z8zDep5wbtzx"
 );
 export const OUTPUT_QUEUE = new PublicKey(
-  "6L7SzhYB3anwEQ9cphpJ1U7Scwj57bx2xueReg7R9cKU"
+  "oq1na8gojfdUhsfCpyjNt6h4JaDWtHf1yQj4koBWfto"
 );
 export const DELEGATION_PROGRAM_ADDRESS = new PublicKey(
   "DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh"

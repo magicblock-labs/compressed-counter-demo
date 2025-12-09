@@ -40,22 +40,7 @@ import {
 } from "./usePhoton";
 import { SYSTEM_PROGRAM_ADDRESS } from "@solana-program/system";
 import { TEST_DELEGATION_PROGRAM_ADDRESS } from "test-delegation";
-
-export const ADDRESS_TREE = new PublicKey(
-  "EzKE84aVTkCUhDHLELqyJaq1Y7UVVmqxXqZjVHwHY3rK"
-);
-export const OUTPUT_QUEUE = new PublicKey(
-  "6L7SzhYB3anwEQ9cphpJ1U7Scwj57bx2xueReg7R9cKU"
-);
-export const DELEGATION_PROGRAM_ADDRESS = new PublicKey(
-  "DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh"
-);
-export const MAGIC_CONTEXT = new PublicKey(
-  "MagicContext1111111111111111111111111111111"
-);
-export const MAGIC_PROGRAM_ADDRESS = new PublicKey(
-  "Magic11111111111111111111111111111111111111"
-);
+import { ADDRESS_TREE, OUTPUT_QUEUE } from "../constants";
 
 type UseCompressedDelegationProps = Readonly<{
   payer: UiWalletAccount;
@@ -123,7 +108,6 @@ export function useCompressedDelegation({
     );
     let packedAccounts =
       PackedAccounts.newWithSystemAccountsSmall(systemAccountConfig);
-    console.log("remainingAccounts", packedAccounts);
 
     const packedTreeInfos = packTreeInfos(
       packedAccounts.toAccountMetas().remainingAccounts.map((a) => a.pubkey),
@@ -159,7 +143,6 @@ export function useCompressedDelegation({
     const delegationRecord = getCompressedDelegationRecordDecoder().decode(
       compressedDelegatedRecord.data!.data
     );
-    console.log("delegationRecord", delegationRecord);
 
     const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
     const message = pipe(

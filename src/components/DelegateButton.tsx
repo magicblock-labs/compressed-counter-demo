@@ -16,6 +16,7 @@ export function DelegateButton({ payer, disabled }: DelegateButtonProps) {
     payer,
     rpc,
     rpcSubscriptions,
+    ephemeral: false,
   });
 
   const handleDelegateCounter = useCallback(async () => {

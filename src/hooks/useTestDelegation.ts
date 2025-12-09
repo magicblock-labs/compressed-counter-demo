@@ -1,10 +1,8 @@
 import {
   AccountRole,
   address,
-  appendTransactionMessageInstruction,
   appendTransactionMessageInstructions,
   createTransactionMessage,
-  getBase58Decoder,
   getBase58Encoder,
   pipe,
   Rpc,
@@ -12,7 +10,6 @@ import {
   sendAndConfirmTransactionFactory,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
-  signAndSendTransactionMessageWithSigners,
   signTransactionMessageWithSigners,
   SolanaRpcApiMainnet,
   SolanaRpcSubscriptionsApi,
@@ -34,10 +31,9 @@ import {
   deriveAddressSeedV2,
   deriveAddressV2,
   packTreeInfos,
-  TreeType,
+  PackedAddressTreeInfo,
 } from "@lightprotocol/stateless.js";
 import { ComputeBudgetProgram, PublicKey } from "@solana/web3.js";
-import { PackedAddressTreeInfo } from "@lightprotocol/stateless.js";
 
 import {
   PackedAccounts,
@@ -57,12 +53,14 @@ type UseTestDelegationProps = Readonly<{
   payer: UiWalletAccount;
   rpc: Rpc<SolanaRpcApiMainnet>;
   rpcSubscriptions: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
+  ephemeral?: boolean;
 }>;
 
 export function useTestDelegation({
   payer,
   rpc,
   rpcSubscriptions,
+  ephemeral = false,
 }: UseTestDelegationProps) {
   const { chain } = useChain();
   const sendAndConfirmTransaction = sendAndConfirmTransactionFactory({
@@ -73,65 +71,38 @@ export function useTestDelegation({
   const counterPda = useCounterPda();
   const photonRpc = usePhoton();
 
-  const createCounter = useCallback(async () => {
-    if (!payer || !counterPda) {
-      console.log("Payer or counter not found", payer, counterPda);
-      throw new Error("Payer or counter not found");
-    }
-
-    const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
-    const message = pipe(
-      createTransactionMessage({ version: "legacy" }),
-      (m) => setTransactionMessageFeePayerSigner(signer, m),
-      (m) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, m),
-      (m) =>
-        appendTransactionMessageInstruction(
-          getCreateCounterInstruction({
-            payer: signer,
-            counter: counterPda,
-            systemProgram: SYSTEM_PROGRAM_ADDRESS,
-          }),
-          m
-        )
-    );
-    const signedTransaction = await signTransactionMessageWithSigners(message);
-    await sendAndConfirmTransaction(
-      {
-        signatures: signedTransaction.signatures,
-        messageBytes: signedTransaction.messageBytes,
-        "__transactionSignedness:@solana/kit": "fullySigned",
-        "__transactionSize:@solana/kit": "withinLimit",
-        lifetimeConstraint: latestBlockhash,
-      },
-      { commitment: "confirmed", skipPreflight: true }
-    );
-    const signatureBytes = await signAndSendTransactionMessageWithSigners(
-      message
-    );
-    const base58Signature = getBase58Decoder().decode(signatureBytes);
-    console.log(base58Signature);
-  }, [payer, counterPda, signer]);
-
   const incrementCounter = useCallback(async () => {
     if (!payer || !counterPda) {
       throw new Error("Payer or counter not found");
     }
+    const counterInfo = (await rpc.getAccountInfo(counterPda).send()).value;
     const { value: latestBlockhash } = await rpc.getLatestBlockhash().send();
     const message = pipe(
       createTransactionMessage({ version: "legacy" }),
       (m) => setTransactionMessageFeePayerSigner(signer, m),
       (m) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, m),
-      (m) =>
-        appendTransactionMessageInstruction(
-          getIncrementCounterInstruction({
+      (m) => {
+        let createIx;
+        if (!counterInfo && !ephemeral) {
+          // Initialize mainnet counter if it does not exist
+          createIx = getCreateCounterInstruction({
+            payer: signer,
             counter: counterPda,
-            authority: signer,
-          }),
+            systemProgram: SYSTEM_PROGRAM_ADDRESS,
+          });
+        }
+        return appendTransactionMessageInstructions(
+          [
+            createIx,
+            getIncrementCounterInstruction({
+              counter: counterPda,
+              authority: signer,
+            }),
+          ].filter((ix) => !!ix),
           m
-        )
+        );
+      }
     );
-    console.log(message);
-    console.log(await rpc.getAccountInfo(counterPda).send());
     const signedTransaction = await signTransactionMessageWithSigners(message);
 
     await sendAndConfirmTransaction(
@@ -151,11 +122,9 @@ export function useTestDelegation({
       throw new Error("Payer or counter not found");
     }
 
-    const addressTree = {
-      tree: ADDRESS_TREE,
-      queue: OUTPUT_QUEUE,
-      tree_type: TreeType.AddressV2,
-    };
+    const counterInfo = (await rpc.getAccountInfo(counterPda).send()).value;
+
+    const addressTree = await photonRpc.getAddressTreeInfoV2();
     const encodedCounterPda = getBase58Encoder().encode(counterPda);
     const addressSeed = deriveAddressSeedV2([
       new Uint8Array(encodedCounterPda),
@@ -173,7 +142,7 @@ export function useTestDelegation({
       PackedAccounts.newWithSystemAccountsSmall(systemAccountConfig);
 
     let result;
-    let ix;
+    let delegateIx;
     try {
       // Try to get the proof of a new address
       result = await photonRpc.getValidityProofV0(
@@ -201,7 +170,7 @@ export function useTestDelegation({
         addressQueuePubkeyIndex,
       };
 
-      ix = getDelegateInstruction({
+      delegateIx = getDelegateInstruction({
         payer: signer,
         counter: counterPda,
         compressedDelegationProgram: COMPRESSED_DELEGATION_PROGRAM_ADDRESS,
@@ -219,7 +188,7 @@ export function useTestDelegation({
         bn(delegatedRecordAddress.toBytes())
       );
       if (!compressedDelegatedRecord) {
-        throw new Error("Compressed delegated record not found");
+        throw new Error(`Compressed delegated record not found (${error})`);
       }
       result = await photonRpc.getValidityProofV0(
         [
@@ -269,7 +238,7 @@ export function useTestDelegation({
         lamports: null,
       };
 
-      ix = getDelegateInstruction({
+      delegateIx = getDelegateInstruction({
         payer: signer,
         counter: counterPda,
         compressedDelegationProgram: COMPRESSED_DELEGATION_PROGRAM_ADDRESS,
@@ -289,7 +258,16 @@ export function useTestDelegation({
       (m) => setTransactionMessageFeePayerSigner(signer, m),
       (m) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, m),
       (m) => {
-        ix.accounts.push(
+        let createIx;
+        if (!counterInfo && !ephemeral) {
+          // Initialize mainnet counter if it does not exist
+          createIx = getCreateCounterInstruction({
+            payer: signer,
+            counter: counterPda,
+            systemProgram: SYSTEM_PROGRAM_ADDRESS,
+          });
+        }
+        delegateIx.accounts.push(
           ...remainingAccounts.toAccountMetas().remainingAccounts.map((a) => ({
             address: address(a.pubkey.toString()),
             role: (a.isSigner && a.isWritable
@@ -303,7 +281,8 @@ export function useTestDelegation({
         );
         return appendTransactionMessageInstructions(
           [
-            ix,
+            createIx,
+            delegateIx,
             {
               ...ComputeBudgetProgram.setComputeUnitLimit({
                 units: 1000000,
@@ -312,14 +291,16 @@ export function useTestDelegation({
                 ComputeBudgetProgram.programId.toString()
               ),
             },
-          ],
+          ].filter((ix) => !!ix),
           m
         );
       }
     );
+    console.log(counterInfo, ephemeral);
     console.log(message);
 
     const signedTransaction = await signTransactionMessageWithSigners(message);
+    console.log(signedTransaction);
     await sendAndConfirmTransaction(
       {
         signatures: signedTransaction.signatures,
@@ -381,7 +362,6 @@ export function useTestDelegation({
   }, [payer, counterPda, signer]);
 
   return {
-    createCounter,
     incrementCounter,
     delegateCounter,
     scheduleUndelegateCounter,

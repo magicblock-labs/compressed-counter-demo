@@ -41,11 +41,6 @@ export function Nav() {
                     }}
                     value={chain}
                   >
-                    {process.env.REACT_EXAMPLE_APP_ENABLE_MAINNET === "true" ? (
-                      <DropdownMenu.RadioItem value="solana:mainnet">
-                        Mainnet Beta
-                      </DropdownMenu.RadioItem>
-                    ) : null}
                     <DropdownMenu.RadioItem value="solana:devnet">
                       Devnet
                     </DropdownMenu.RadioItem>

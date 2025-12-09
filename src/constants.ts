@@ -19,6 +19,4 @@ export const MAGIC_CONTEXT = new PublicKey(
 export const MAGIC_PROGRAM_ADDRESS = new PublicKey(
   "Magic11111111111111111111111111111111111111"
 );
-export const VALIDATOR = address(
-  "45cWPYAk14mYTsn5GvNu89y3kxA1XqAzzbPH7bSPCajA"
-);
+export const VALIDATOR = address("MTAWuRvVFSB36x6rpHQwZMeM6dBSDupbiw6nBQ65mLR");

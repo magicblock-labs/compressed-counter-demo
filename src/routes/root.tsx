@@ -1,26 +1,12 @@
-import {
-  Box,
-  Container,
-  Flex,
-  Grid,
-  Heading,
-  Card,
-  Text,
-} from "@radix-ui/themes";
+import { Container, Flex, Grid, Text } from "@radix-ui/themes";
 
 import { useSelectedWallet } from "../hooks/useSelectedWallet";
 import { useCounter } from "../hooks/useCounter";
-import { CreateCounterButton } from "../components/CreateCounterButton";
-import { IncrementCounterButton } from "../components/IncrementCounterButton";
 import { useRpc } from "../hooks/useRpc";
-import { DelegateButton } from "../components/DelegateButton";
-import { UndelegateButton } from "../components/UndelegateButton";
-import { COMPRESSED_DELEGATION_PROGRAM_ADDRESS } from "compressed-delegation-program";
-import { ScheduleUndelegateButton } from "../components/ScheduleUndelegateButton";
-import { DELEGATION_PROGRAM_ADDRESS } from "../constants";
-import { TEST_DELEGATION_PROGRAM_ADDRESS } from "test-delegation";
 import "../components/Card.css";
 import "./Counter.css";
+import { MainnetCard } from "../components/MainnetCard";
+import { EphemeralCard } from "../components/EphemeralCard";
 
 function Root() {
   const [selectedWalletAccount] = useSelectedWallet();
@@ -28,10 +14,11 @@ function Root() {
     useRpc();
   const { counterMainnet, counterEphemeral, mainnetOwner, ephemeralOwner } =
     useCounter();
-  console.log("mainnet", counterMainnet);
-  console.log("ephemeral", counterEphemeral);
+
   console.log("mainnetOwner", mainnetOwner);
   console.log("ephemeralOwner", ephemeralOwner);
+  console.log("counterMainnet", counterMainnet);
+  console.log("counterEphemeral", counterEphemeral);
 
   return (
     <Container mx={{ initial: "3", xs: "6" }}>
@@ -45,75 +32,22 @@ function Root() {
             m="auto"
             gap="4"
           >
-            <Box
-              maxWidth="240px"
-              m="auto"
-              style={{
-                animation: "fadeInUp 0.6s ease-out 0.1s both",
-              }}
-            >
-              <Card size="2">
-                <Flex direction="column" justify="center" gap="2">
-                  <Heading align="center">Onchain</Heading>
-                  <Heading size="8" align="center" m="4">
-                    {counterMainnet?.counter ?? 0}
-                  </Heading>
-                  <IncrementCounterButton
-                    payer={selectedWalletAccount}
-                    rpc={rpc}
-                    rpcSubscriptions={rpcSubscriptions}
-                    disabled={mainnetOwner !== TEST_DELEGATION_PROGRAM_ADDRESS}
-                  />
-                  {mainnetOwner === TEST_DELEGATION_PROGRAM_ADDRESS ? (
-                    <DelegateButton payer={selectedWalletAccount} />
-                  ) : (
-                    <UndelegateButton
-                      payer={selectedWalletAccount}
-                      disabled={
-                        !(
-                          ephemeralOwner ===
-                            DELEGATION_PROGRAM_ADDRESS.toString() &&
-                          mainnetOwner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS
-                        )
-                      }
-                    />
-                  )}
-                </Flex>
-              </Card>
-            </Box>
-            <Box
-              maxWidth="240px"
-              m="auto"
-              style={{
-                animation: "fadeInUp 0.6s ease-out 0.2s both",
-              }}
-            >
-              <Card size="2">
-                <Flex direction="column" justify="center" gap="2">
-                  <Heading align="center">Delegated</Heading>
-                  <Heading size="8" align="center" m="4">
-                    {counterEphemeral?.counter ?? 0}
-                  </Heading>
-                  <IncrementCounterButton
-                    payer={selectedWalletAccount}
-                    rpc={rpcEphemeral}
-                    rpcSubscriptions={rpcSubscriptionsEphemeral}
-                    disabled={mainnetOwner === TEST_DELEGATION_PROGRAM_ADDRESS}
-                  />
-                  <ScheduleUndelegateButton
-                    payer={selectedWalletAccount}
-                    disabled={
-                      ephemeralOwner !== TEST_DELEGATION_PROGRAM_ADDRESS
-                    }
-                  />
-                </Flex>
-              </Card>
-            </Box>
+            <MainnetCard
+              selectedWalletAccount={selectedWalletAccount}
+              rpc={rpc}
+              rpcSubscriptions={rpcSubscriptions}
+              counterMainnet={counterMainnet}
+              mainnetOwner={mainnetOwner}
+              ephemeralOwner={ephemeralOwner}
+            />
+            <EphemeralCard
+              selectedWalletAccount={selectedWalletAccount}
+              rpc={rpcEphemeral}
+              rpcSubscriptions={rpcSubscriptionsEphemeral}
+              counterEphemeral={counterEphemeral}
+              ephemeralOwner={ephemeralOwner}
+            />
           </Grid>
-          {!counterMainnet &&
-            mainnetOwner !== COMPRESSED_DELEGATION_PROGRAM_ADDRESS && (
-              <CreateCounterButton payer={selectedWalletAccount} />
-            )}
         </Flex>
       ) : (
         <Flex

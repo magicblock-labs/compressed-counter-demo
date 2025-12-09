@@ -1,20 +1,24 @@
-import { Address, getProgramDerivedAddress } from "@solana/kit";
+import { address, Address } from "@solana/kit";
 import { useEffect, useState } from "react";
-import { TEST_DELEGATION_PROGRAM_ADDRESS } from "test-delegation";
+import { findCounterPda } from "test-delegation";
+import { useSelectedWallet } from "./useSelectedWallet";
 
 export function useCounterPda() {
   const [counterPda, setCounterPda] = useState<Address>();
+  const [selectedWalletAccount] = useSelectedWallet();
 
   useEffect(() => {
     async function fetchCounterPda() {
-      const pda = await getProgramDerivedAddress({
-        programAddress: TEST_DELEGATION_PROGRAM_ADDRESS,
-        seeds: [new TextEncoder().encode("counter")],
+      if (!selectedWalletAccount?.address) {
+        return;
+      }
+      const [pda] = await findCounterPda({
+        authority: address(selectedWalletAccount.address),
       });
-      setCounterPda(pda[0]);
+      setCounterPda(pda);
     }
     fetchCounterPda();
-  }, []);
+  }, [selectedWalletAccount]);
 
   return counterPda;
 }

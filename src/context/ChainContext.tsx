@@ -14,8 +14,10 @@ export const DEFAULT_CHAIN_CONFIG = Object.freeze({
   chain: "solana:devnet",
   displayName: "Devnet",
   solanaExplorerClusterName: "devnet",
-  solanaRpcSubscriptionsUrl: `https://api.devnet.solana.com`,
-  solanaRpcUrl: `https://api.devnet.solana.com`,
+  solanaRpcSubscriptionsUrl:
+    import.meta.env.VITE_RPC_URL?.replace("http", "ws") ??
+    `wss://api.devnet.solana.com`,
+  solanaRpcUrl: import.meta.env.VITE_RPC_URL ?? `https://api.devnet.solana.com`,
 });
 
 export const ChainContext = createContext<ChainContext>(DEFAULT_CHAIN_CONFIG);

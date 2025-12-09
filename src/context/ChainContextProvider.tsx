@@ -18,7 +18,7 @@ export function ChainContextProvider({
     switch (chain) {
       // @ts-expect-error Intentional fall through
       case "solana:mainnet":
-        if (process.env.REACT_EXAMPLE_APP_ENABLE_MAINNET === "true") {
+        if (import.meta.env.VITE_REACT_EXAMPLE_APP_ENABLE_MAINNET === "true") {
           return {
             chain: "solana:mainnet",
             displayName: "Mainnet Beta",
@@ -34,8 +34,13 @@ export function ChainContextProvider({
           chain: "solana:devnet",
           displayName: "Devnet",
           solanaExplorerClusterName: "devnet",
-          solanaRpcSubscriptionsUrl: devnet(`wss://api.devnet.solana.com`),
-          solanaRpcUrl: devnet(`https://api.devnet.solana.com`),
+          solanaRpcSubscriptionsUrl: devnet(
+            import.meta.env.VITE_RPC_URL?.replace("http", "ws") ??
+              `wss://api.devnet.solana.com`
+          ),
+          solanaRpcUrl: devnet(
+            import.meta.env.VITE_RPC_URL ?? `https://api.devnet.solana.com`
+          ),
         };
       case "solana:localhost":
         return {

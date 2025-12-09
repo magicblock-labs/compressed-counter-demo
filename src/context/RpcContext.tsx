@@ -17,12 +17,25 @@ export const RpcContext = createContext<{
   rpcSubscriptions: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
   rpcSubscriptionsEphemeral: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
 }>({
-  rpc: createSolanaRpc(`https://api.devnet.solana.com`),
-  rpcEphemeral: createSolanaRpc(devnet(`https://testnet-as.magicblock.app`)),
+  rpc: createSolanaRpc(
+    import.meta.env.VITE_RPC_URL ?? `https://api.devnet.solana.com`
+  ),
+  rpcEphemeral: createSolanaRpc(
+    devnet(
+      import.meta.env.VITE_EPHEMERAL_RPC_URL ??
+        `https://testnet-as.magicblock.app`
+    )
+  ),
   rpcSubscriptions: createSolanaRpcSubscriptions(
-    devnet(`wss://api.devnet.solana.com`)
+    devnet(
+      import.meta.env.VITE_RPC_URL?.replace("http", "ws") ??
+        `wss://api.devnet.solana.com`
+    )
   ),
   rpcSubscriptionsEphemeral: createSolanaRpcSubscriptions(
-    devnet(`wss://testnet-as.magicblock.app`)
+    devnet(
+      import.meta.env.VITE_EPHEMERAL_URL?.replace("http", "ws") ??
+        `wss://testnet-as.magicblock.app`
+    )
   ),
 });

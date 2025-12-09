@@ -10,7 +10,9 @@ import { ChainContextProvider } from "./context/ChainContextProvider.tsx";
 import { RpcContextProvider } from "./context/RpcContextProvider.tsx";
 import { SelectedWalletAccountContextProvider } from "./context/SelectedWalletAccountContextProvider.tsx";
 import Root from "./routes/root.tsx";
+import { featureFlags, VERSION } from "@lightprotocol/stateless.js";
 
+featureFlags.version = VERSION.V2;
 const rootNode = document.getElementById("root")!;
 const root = createRoot(rootNode);
 root.render(

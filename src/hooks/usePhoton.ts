@@ -6,9 +6,11 @@ import {
 import { AccountMeta, PublicKey } from "@solana/web3.js";
 import { useMemo } from "react";
 
-export const RPC_URL = "http://localhost:8899";
-export const INDEXER_URL = "http://localhost:8784";
-export const PROVER_URL = "http://localhost:3001";
+export const RPC_URL = import.meta.env.VITE_RPC_URL ?? "http://localhost:8899";
+export const INDEXER_URL =
+  import.meta.env.VITE_RPC_URL ?? "http://localhost:8784";
+export const PROVER_URL =
+  import.meta.env.VITE_RPC_URL ?? "http://localhost:3001";
 
 export function usePhoton() {
   const photonRpc = useMemo(

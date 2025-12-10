@@ -4,17 +4,13 @@ import {
   defaultStaticAccountsStruct,
 } from "@lightprotocol/stateless.js";
 import { AccountMeta, PublicKey } from "@solana/web3.js";
-import { useMemo } from "react";
-
-export const RPC_URL = import.meta.env.VITE_RPC_URL ?? "http://localhost:8899";
-export const INDEXER_URL =
-  import.meta.env.VITE_RPC_URL ?? "http://localhost:8784";
-export const PROVER_URL =
-  import.meta.env.VITE_RPC_URL ?? "http://localhost:3001";
+import { useContext, useMemo } from "react";
+import { ChainContext } from "../context/ChainContext";
 
 export function usePhoton() {
+  const { solanaRpcUrl, photonUrl, proverUrl } = useContext(ChainContext);
   const photonRpc = useMemo(
-    () => createRpc(RPC_URL, INDEXER_URL, PROVER_URL),
+    () => createRpc(solanaRpcUrl, photonUrl, proverUrl),
     []
   );
 

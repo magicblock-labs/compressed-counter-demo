@@ -15,6 +15,7 @@ export function useCounterPda() {
       const [pda] = await findCounterPda({
         authority: address(selectedWalletAccount.address),
       });
+      console.log("pda", pda);
       setCounterPda(pda);
     }
     fetchCounterPda();

@@ -9,21 +9,31 @@ type Props = Readonly<{
 }>;
 
 export function RpcContextProvider({ children }: Props) {
-  const { solanaRpcSubscriptionsUrl, solanaRpcUrl } = useContext(ChainContext);
+  const {
+    solanaRpcSubscriptionsUrl,
+    solanaRpcUrl,
+    ephemeralRpcSubscriptionsUrl,
+    ephemeralRpcUrl,
+  } = useContext(ChainContext);
   return (
     <RpcContext.Provider
       value={useMemo(
         () => ({
           rpc: createSolanaRpc(solanaRpcUrl),
-          rpcEphemeral: createSolanaRpc(`https://testnet-as.magicblock.app`),
+          rpcEphemeral: createSolanaRpc(ephemeralRpcUrl),
           rpcSubscriptions: createSolanaRpcSubscriptions(
             solanaRpcSubscriptionsUrl
           ),
           rpcSubscriptionsEphemeral: createSolanaRpcSubscriptions(
-            `wss://testnet-as.magicblock.app`
+            ephemeralRpcSubscriptionsUrl
           ),
         }),
-        [solanaRpcSubscriptionsUrl, solanaRpcUrl]
+        [
+          solanaRpcSubscriptionsUrl,
+          solanaRpcUrl,
+          ephemeralRpcSubscriptionsUrl,
+          ephemeralRpcUrl,
+        ]
       )}
     >
       {children}

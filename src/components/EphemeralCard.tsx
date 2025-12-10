@@ -10,12 +10,15 @@ import {
   SolanaRpcSubscriptionsApi,
 } from "@solana/kit";
 import { UiWalletAccount } from "@wallet-standard/react";
+import { COMPRESSED_DELEGATION_PROGRAM_ADDRESS } from "compressed-delegation-program";
+import { DELEGATION_PROGRAM_ADDRESS } from "../constants";
 
 type EphemeralCardProps = Readonly<{
   selectedWalletAccount: UiWalletAccount;
   rpc: Rpc<SolanaRpcApiMainnet>;
   rpcSubscriptions: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
   counterEphemeral?: Counter;
+  mainnetOwner?: Address;
   ephemeralOwner?: Address;
 }>;
 export function EphemeralCard({
@@ -23,6 +26,7 @@ export function EphemeralCard({
   rpc,
   rpcSubscriptions,
   counterEphemeral,
+  mainnetOwner,
   ephemeralOwner,
 }: EphemeralCardProps) {
   return (
@@ -43,12 +47,20 @@ export function EphemeralCard({
             payer={selectedWalletAccount}
             rpc={rpc}
             rpcSubscriptions={rpcSubscriptions}
-            disabled={ephemeralOwner !== TEST_DELEGATION_PROGRAM_ADDRESS}
+            disabled={
+              mainnetOwner === TEST_DELEGATION_PROGRAM_ADDRESS ||
+              ephemeralOwner === DELEGATION_PROGRAM_ADDRESS ||
+              !mainnetOwner
+            }
             ephemeral={true}
           />
           <ScheduleUndelegateButton
             payer={selectedWalletAccount}
-            disabled={ephemeralOwner !== TEST_DELEGATION_PROGRAM_ADDRESS}
+            disabled={
+              mainnetOwner === TEST_DELEGATION_PROGRAM_ADDRESS ||
+              ephemeralOwner === DELEGATION_PROGRAM_ADDRESS ||
+              !mainnetOwner
+            }
           />
         </Flex>
       </Card>

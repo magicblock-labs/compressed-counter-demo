@@ -14,9 +14,14 @@ import { getErrorMessage } from "../errors";
 type DelegateButtonProps = Readonly<{
   payer: UiWalletAccount;
   disabled?: boolean;
+  fetchCounter?: () => Promise<void>;
 }>;
 
-export function DelegateButton({ payer, disabled }: DelegateButtonProps) {
+export function DelegateButton({
+  payer,
+  disabled,
+  fetchCounter,
+}: DelegateButtonProps) {
   const [isDelegating, setIsDelegating] = useState(false);
   const { rpc, rpcSubscriptions } = useRpc();
   const { delegateCounter } = useTestDelegation({
@@ -24,6 +29,7 @@ export function DelegateButton({ payer, disabled }: DelegateButtonProps) {
     rpc,
     rpcSubscriptions,
     ephemeral: false,
+    fetchCounter,
   });
   const { solanaExplorerClusterName } = useChain();
 

@@ -21,6 +21,7 @@ type MainnetCardProps = Readonly<{
   counterMainnet?: Counter;
   mainnetOwner?: Address;
   ephemeralOwner?: Address;
+  fetchCounter?: () => Promise<void>;
 }>;
 
 export function MainnetCard({
@@ -30,6 +31,7 @@ export function MainnetCard({
   counterMainnet,
   mainnetOwner,
   ephemeralOwner,
+  fetchCounter,
 }: MainnetCardProps) {
   return (
     <Box
@@ -51,9 +53,13 @@ export function MainnetCard({
             rpcSubscriptions={rpcSubscriptions}
             disabled={mainnetOwner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS}
             ephemeral={false}
+            fetchCounter={fetchCounter}
           />
           {mainnetOwner === TEST_DELEGATION_PROGRAM_ADDRESS || !mainnetOwner ? (
-            <DelegateButton payer={selectedWalletAccount} />
+            <DelegateButton
+              payer={selectedWalletAccount}
+              fetchCounter={fetchCounter}
+            />
           ) : (
             <UndelegateButton
               payer={selectedWalletAccount}

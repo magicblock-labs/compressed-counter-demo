@@ -7,7 +7,6 @@ import {
   pipe,
   Rpc,
   RpcSubscriptions,
-  sendAndConfirmTransactionFactory,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
   signTransactionMessageWithSigners,
@@ -39,6 +38,7 @@ import {
 } from "./usePhoton";
 import { SYSTEM_PROGRAM_ADDRESS } from "@solana-program/system";
 import { TEST_DELEGATION_PROGRAM_ADDRESS } from "test-delegation";
+import { useSendTransaction } from "./useSendTransaction";
 
 type UseCompressedDelegationProps = Readonly<{
   payer: UiWalletAccount;
@@ -52,10 +52,7 @@ export function useCompressedDelegation({
   rpcSubscriptions,
 }: UseCompressedDelegationProps) {
   const { chain } = useChain();
-  const sendAndConfirmTransaction = sendAndConfirmTransactionFactory({
-    rpc: rpc,
-    rpcSubscriptions: rpcSubscriptions,
-  });
+  const sendTransaction = useSendTransaction({ rpc, rpcSubscriptions });
   const signer = useWalletAccountTransactionSigner(payer, chain);
   const counterPda = useCounterPda();
   const photonRpc = usePhoton();
@@ -185,16 +182,10 @@ export function useCompressedDelegation({
     );
     console.log(message);
     const signedTransaction = await signTransactionMessageWithSigners(message);
-    await sendAndConfirmTransaction(
-      {
-        signatures: signedTransaction.signatures,
-        messageBytes: signedTransaction.messageBytes,
-        "__transactionSignedness:@solana/kit": "fullySigned",
-        "__transactionSize:@solana/kit": "withinLimit",
-        lifetimeConstraint: latestBlockhash,
-      },
-      { commitment: "confirmed", skipPreflight: true }
-    );
+    await sendTransaction({
+      ...signedTransaction,
+      lifetimeConstraint: latestBlockhash,
+    });
   }, [payer, counterPda, signer]);
 
   return {

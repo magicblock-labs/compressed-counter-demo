@@ -2,7 +2,7 @@ import { mainnet, devnet } from "@solana/kit";
 import { useMemo, useState } from "react";
 
 import { ChainContext, DEFAULT_CHAIN_CONFIG } from "./ChainContext";
-import { DEVNET_PORT } from "../constants";
+import { DEVNET_PORT, EPHEMERAL_PORT } from "../constants";
 
 const STORAGE_KEY = "solana-example-react-app:selected-chain";
 
@@ -27,6 +27,16 @@ export function ChainContextProvider({
               "wss://api.mainnet-beta.solana.com"
             ),
             solanaRpcUrl: mainnet("https://api.mainnet-beta.solana.com"),
+            ephemeralRpcSubscriptionsUrl: mainnet(
+              "wss://testnet-as.magicblock.app"
+            ),
+            ephemeralRpcUrl: mainnet("https://testnet-as.magicblock.app"),
+            photonUrl: mainnet(
+              import.meta.env.VITE_RPC_URL ?? `http://localhost:8784`
+            ),
+            proverUrl: mainnet(
+              import.meta.env.VITE_RPC_URL ?? `http://localhost:3001`
+            ),
           };
         }
       case "solana:devnet":
@@ -41,16 +51,36 @@ export function ChainContextProvider({
           solanaRpcUrl: devnet(
             import.meta.env.VITE_RPC_URL ?? `https://api.devnet.solana.com`
           ),
+          ephemeralRpcSubscriptionsUrl: devnet(
+            import.meta.env.VITE_EPHEMERAL_URL?.replace("http", "ws") ??
+              `wss://testnet-as.magicblock.app`
+          ),
+          ephemeralRpcUrl: devnet(
+            import.meta.env.VITE_EPHEMERAL_URL ??
+              `https://testnet-as.magicblock.app`
+          ),
+          photonUrl: devnet(
+            import.meta.env.VITE_RPC_URL ?? `http://localhost:8784`
+          ),
+          proverUrl: devnet(
+            import.meta.env.VITE_RPC_URL ?? `http://localhost:3001`
+          ),
         };
-      case "solana:localhost":
+      case "solana:localnet":
         return {
-          chain: "solana:localhost",
-          displayName: "Localhost",
-          solanaExplorerClusterName: "localhost",
+          chain: "solana:localnet",
+          displayName: "Localnet",
+          solanaExplorerClusterName: "localnet",
           solanaRpcSubscriptionsUrl: devnet(
             `ws://localhost:${DEVNET_PORT + 1}`
           ),
           solanaRpcUrl: devnet(`http://localhost:${DEVNET_PORT}`),
+          ephemeralRpcSubscriptionsUrl: devnet(
+            `ws://localhost:${EPHEMERAL_PORT + 1}`
+          ),
+          ephemeralRpcUrl: devnet(`http://localhost:${EPHEMERAL_PORT}`),
+          photonUrl: devnet(`http://localhost:8784`),
+          proverUrl: devnet(`http://localhost:3001`),
         };
       default:
         if (chain !== "solana:devnet") {

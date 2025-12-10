@@ -14,8 +14,6 @@ function replaceProcessEnv(mode: string): Plugin {
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   base: process.env.REACT_EXAMPLE_APP_BASE_PATH,
-  define: {
-    "process.env": process.env,
-  },
+  define: {},
   plugins: [react(), replaceProcessEnv(mode)],
 }));

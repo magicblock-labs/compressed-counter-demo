@@ -12,8 +12,13 @@ function Root() {
   const [selectedWalletAccount] = useSelectedWallet();
   const { rpc, rpcSubscriptions, rpcEphemeral, rpcSubscriptionsEphemeral } =
     useRpc();
-  const { counterMainnet, counterEphemeral, mainnetOwner, ephemeralOwner } =
-    useCounter();
+  const {
+    counterMainnet,
+    counterEphemeral,
+    mainnetOwner,
+    ephemeralOwner,
+    fetchCounter,
+  } = useCounter();
 
   console.log("mainnetOwner", mainnetOwner);
   console.log("ephemeralOwner", ephemeralOwner);
@@ -50,12 +55,14 @@ function Root() {
               counterMainnet={counterMainnet}
               mainnetOwner={mainnetOwner}
               ephemeralOwner={ephemeralOwner}
+              fetchCounter={fetchCounter}
             />
             <EphemeralCard
               selectedWalletAccount={selectedWalletAccount}
               rpc={rpcEphemeral}
               rpcSubscriptions={rpcSubscriptionsEphemeral}
               counterEphemeral={counterEphemeral}
+              mainnetOwner={mainnetOwner}
               ephemeralOwner={ephemeralOwner}
             />
           </Grid>

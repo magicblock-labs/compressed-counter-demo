@@ -7,7 +7,6 @@ import {
   pipe,
   Rpc,
   RpcSubscriptions,
-  sendAndConfirmTransactionFactory,
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
   signTransactionMessageWithSigners,
@@ -41,19 +40,20 @@ import {
   usePhoton,
 } from "./usePhoton";
 import {
-  ADDRESS_TREE,
   MAGIC_CONTEXT,
   MAGIC_PROGRAM_ADDRESS,
   OUTPUT_QUEUE,
-  VALIDATOR,
 } from "../constants";
 import { SYSTEM_PROGRAM_ADDRESS } from "@solana-program/system";
+import { useSendTransaction } from "./useSendTransaction";
+import { useValidatorId } from "./useValidatorId";
 
 type UseTestDelegationProps = Readonly<{
   payer: UiWalletAccount;
   rpc: Rpc<SolanaRpcApiMainnet>;
   rpcSubscriptions: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
   ephemeral?: boolean;
+  fetchCounter?: () => Promise<void>;
 }>;
 
 export function useTestDelegation({
@@ -61,15 +61,14 @@ export function useTestDelegation({
   rpc,
   rpcSubscriptions,
   ephemeral = false,
+  fetchCounter,
 }: UseTestDelegationProps) {
   const { chain } = useChain();
-  const sendAndConfirmTransaction = sendAndConfirmTransactionFactory({
-    rpc: rpc,
-    rpcSubscriptions: rpcSubscriptions,
-  });
   const signer = useWalletAccountTransactionSigner(payer, chain);
   const counterPda = useCounterPda();
   const photonRpc = usePhoton();
+  const sendTransaction = useSendTransaction({ rpc, rpcSubscriptions });
+  const validatorId = useValidatorId();
 
   const incrementCounter = useCallback(async () => {
     if (!payer || !counterPda) {
@@ -104,33 +103,25 @@ export function useTestDelegation({
       }
     );
     const signedTransaction = await signTransactionMessageWithSigners(message);
+    await sendTransaction({
+      ...signedTransaction,
+      lifetimeConstraint: latestBlockhash,
+    });
 
-    await sendAndConfirmTransaction(
-      {
-        signatures: signedTransaction.signatures,
-        messageBytes: signedTransaction.messageBytes,
-        "__transactionSignedness:@solana/kit": "fullySigned",
-        "__transactionSize:@solana/kit": "withinLimit",
-        lifetimeConstraint: latestBlockhash,
-      },
-      { commitment: "confirmed", skipPreflight: true }
-    );
+    // On counter creation, refresh the counter
+    if (!counterInfo && !ephemeral) fetchCounter && fetchCounter();
   }, [payer, counterPda, signer]);
 
   const delegateCounter = useCallback(async () => {
-    if (!payer || !counterPda) {
+    if (!payer || !counterPda || !validatorId) {
       throw new Error("Payer or counter not found");
     }
 
     const counterInfo = (await rpc.getAccountInfo(counterPda).send()).value;
 
     const addressTree = await photonRpc.getAddressTreeInfoV2();
+
     addressTree.queue = OUTPUT_QUEUE;
-    console.log("addressTree", addressTree);
-    console.log("addressTree.tree", addressTree.tree.toString());
-    console.log("addressTree.queue", addressTree.queue.toString());
-    console.log(ADDRESS_TREE.toString());
-    console.log(OUTPUT_QUEUE.toString());
     const encodedCounterPda = getBase58Encoder().encode(counterPda);
     const addressSeed = deriveAddressSeedV2([
       new Uint8Array(encodedCounterPda),
@@ -155,7 +146,7 @@ export function useTestDelegation({
         [],
         [
           {
-            address: delegatedRecordAddress.toBytes(),
+            address: bn(delegatedRecordAddress.toBytes()),
             tree: addressTree.tree,
             queue: addressTree.queue,
           },
@@ -183,7 +174,7 @@ export function useTestDelegation({
         counter: counterPda,
         compressedDelegationProgram: COMPRESSED_DELEGATION_PROGRAM_ADDRESS,
         args: {
-          validator: VALIDATOR,
+          validator: validatorId,
           validityProof,
           addressTreeInfo: packedAddreesMerkleContext,
           outputStateTreeIndex: addressQueuePubkeyIndex,
@@ -193,7 +184,7 @@ export function useTestDelegation({
     } catch (error) {
       // Try getting an existing account
       const compressedDelegatedRecord = await photonRpc.getCompressedAccount(
-        bn(delegatedRecordAddress.toBytes())
+        delegatedRecordAddress.toBytes()
       );
       if (!compressedDelegatedRecord) {
         throw new Error(`Compressed delegated record not found (${error})`);
@@ -251,7 +242,7 @@ export function useTestDelegation({
         counter: counterPda,
         compressedDelegationProgram: COMPRESSED_DELEGATION_PROGRAM_ADDRESS,
         args: {
-          validator: VALIDATOR,
+          validator: validatorId,
           validityProof,
           addressTreeInfo: null,
           outputStateTreeIndex: accountMeta.outputStateTreeIndex,
@@ -308,17 +299,14 @@ export function useTestDelegation({
     console.log(message);
 
     const signedTransaction = await signTransactionMessageWithSigners(message);
-    console.log(signedTransaction);
-    await sendAndConfirmTransaction(
-      {
-        signatures: signedTransaction.signatures,
-        messageBytes: signedTransaction.messageBytes,
-        "__transactionSignedness:@solana/kit": "fullySigned",
-        "__transactionSize:@solana/kit": "withinLimit",
-        lifetimeConstraint: latestBlockhash,
-      },
-      { commitment: "confirmed", skipPreflight: true }
-    );
+
+    await sendTransaction({
+      ...signedTransaction,
+      lifetimeConstraint: latestBlockhash,
+    });
+
+    // On counter creation, refresh the counter
+    if (!counterInfo && !ephemeral) fetchCounter && fetchCounter();
   }, [payer, counterPda, signer]);
 
   const scheduleUndelegateCounter = useCallback(async () => {
@@ -357,16 +345,10 @@ export function useTestDelegation({
     console.log(message);
 
     const signedTransaction = await signTransactionMessageWithSigners(message);
-    await sendAndConfirmTransaction(
-      {
-        signatures: signedTransaction.signatures,
-        messageBytes: signedTransaction.messageBytes,
-        "__transactionSignedness:@solana/kit": "fullySigned",
-        "__transactionSize:@solana/kit": "withinLimit",
-        lifetimeConstraint: latestBlockhash,
-      },
-      { commitment: "confirmed", skipPreflight: true }
-    );
+    await sendTransaction({
+      ...signedTransaction,
+      lifetimeConstraint: latestBlockhash,
+    });
   }, [payer, counterPda, signer]);
 
   return {

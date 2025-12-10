@@ -28,6 +28,7 @@ import { ChainContext } from '../context/ChainContext';
 import { RpcContext } from '../context/RpcContext';
 import { ErrorDialog } from './ErrorDialog';
 import { WalletMenuItemContent } from './WalletMenuItemContent';
+import { toast } from 'sonner';
 
 type Props = Readonly<{
     account: UiWalletAccount;
@@ -155,6 +156,9 @@ export function SolanaSignTransactionFeaturePanel({ account }: Props) {
             setLastSignature(signature);
             setSolQuantityString('');
             setSignTransactionState({ kind: 'inputs-form-active' });
+            toast.success('Transaction sent', {
+                description: signature,
+            });
         } catch (e) {
             setLastSignature(undefined);
             setError(e);

@@ -22,6 +22,7 @@ type IncrementCounterButtonProps = Readonly<{
   rpcSubscriptions: RpcSubscriptions<SolanaRpcSubscriptionsApi>;
   disabled?: boolean;
   ephemeral?: boolean;
+  fetchCounter?: () => Promise<void>;
 }>;
 
 export function IncrementCounterButton({
@@ -30,6 +31,7 @@ export function IncrementCounterButton({
   rpcSubscriptions,
   disabled,
   ephemeral,
+  fetchCounter,
 }: IncrementCounterButtonProps) {
   const [isIncrementingCounter, setIsIncrementingCounter] = useState(false);
   const { incrementCounter } = useTestDelegation({
@@ -37,6 +39,7 @@ export function IncrementCounterButton({
     rpc,
     rpcSubscriptions,
     ephemeral,
+    fetchCounter,
   });
   const { solanaExplorerClusterName } = useChain();
 

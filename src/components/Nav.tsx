@@ -44,8 +44,8 @@ export function Nav() {
                     <DropdownMenu.RadioItem value="solana:devnet">
                       Devnet
                     </DropdownMenu.RadioItem>
-                    <DropdownMenu.RadioItem value="solana:localhost">
-                      Localhost
+                    <DropdownMenu.RadioItem value="solana:localnet">
+                      Localnet
                     </DropdownMenu.RadioItem>
                   </DropdownMenu.RadioGroup>
                 </DropdownMenu.Content>

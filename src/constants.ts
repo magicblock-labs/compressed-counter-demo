@@ -10,7 +10,7 @@ export const ADDRESS_TREE = new PublicKey(
 export const OUTPUT_QUEUE = new PublicKey(
   "oq1na8gojfdUhsfCpyjNt6h4JaDWtHf1yQj4koBWfto"
 );
-export const DELEGATION_PROGRAM_ADDRESS = new PublicKey(
+export const DELEGATION_PROGRAM_ADDRESS = address(
   "DELeGGvXpWV2fqJUhqcF5ZSYMS4JTLjteaAMARRSaeSh"
 );
 export const MAGIC_CONTEXT = new PublicKey(
@@ -19,4 +19,3 @@ export const MAGIC_CONTEXT = new PublicKey(
 export const MAGIC_PROGRAM_ADDRESS = new PublicKey(
   "Magic11111111111111111111111111111111111111"
 );
-export const VALIDATOR = address("MTAWuRvVFSB36x6rpHQwZMeM6dBSDupbiw6nBQ65mLR");

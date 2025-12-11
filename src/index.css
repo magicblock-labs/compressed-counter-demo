@@ -297,3 +297,18 @@ button:focus-visible {
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+@keyframes fadeInLogo {
+  from {
+    opacity: 0;
+    transform: translateY(30px) translateX(-50%) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%) scale(1);
+  }
+}
+
+img[alt="Compressed Counter"] {
+  animation: fadeInLogo 0.7s cubic-bezier(0.42, 0, 0.58, 1) 0.25s both;
+}

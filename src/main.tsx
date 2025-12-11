@@ -31,6 +31,18 @@ root.render(
                   style={{ flex: 1, display: "flex", flexDirection: "column" }}
                 >
                   <Root />
+                  <img
+                    src="/MagicBlock-Logo-White.png"
+                    alt="Compressed Counter"
+                    style={{
+                      position: "absolute",
+                      bottom: "40px",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: "250px",
+                      margin: "0 auto",
+                    }}
+                  />
                 </Section>
               </Flex>
               <Toaster position="top-right" />

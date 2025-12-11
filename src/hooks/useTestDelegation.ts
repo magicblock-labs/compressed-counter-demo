@@ -111,6 +111,8 @@ export function useTestDelegation({
         );
       }
     );
+    console.log(message);
+
     const signedTransaction = await signTransactionMessageWithSigners(message);
     await sendTransaction({
       ...signedTransaction,
@@ -311,6 +313,7 @@ export function useTestDelegation({
         );
       }
     );
+    console.log(message);
 
     const signedTransaction = await signTransactionMessageWithSigners(message);
 
@@ -356,6 +359,7 @@ export function useTestDelegation({
         );
       }
     );
+    console.log(message);
 
     const signedTransaction = await signTransactionMessageWithSigners(message);
     const sig = await sendTransaction({

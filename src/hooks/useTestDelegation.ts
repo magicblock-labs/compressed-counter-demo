@@ -31,8 +31,10 @@ import {
   deriveAddressV2,
   packTreeInfos,
   PackedAddressTreeInfo,
+  TreeType,
 } from "@lightprotocol/stateless.js";
 import { ComputeBudgetProgram, PublicKey } from "@solana/web3.js";
+import { Connection } from "@magicblock-labs/ephemeral-rollups-kit";
 
 import {
   PackedAccounts,
@@ -43,6 +45,7 @@ import {
   MAGIC_CONTEXT,
   MAGIC_PROGRAM_ADDRESS,
   OUTPUT_QUEUE,
+  BATCHED_MERKLE_TREE,
 } from "../constants";
 import { SYSTEM_PROGRAM_ADDRESS } from "@solana-program/system";
 import { useSendTransaction } from "./useSendTransaction";
@@ -56,14 +59,20 @@ type UseTestDelegationProps = Readonly<{
   fetchCounter?: () => Promise<void>;
 }>;
 
+type UseTestDelegationReturn = Readonly<{
+  incrementCounter: () => Promise<void>;
+  delegateCounter: () => Promise<void>;
+  scheduleUndelegateCounter: () => Promise<string>;
+}>;
+
 export function useTestDelegation({
   payer,
   rpc,
   rpcSubscriptions,
   ephemeral = false,
   fetchCounter,
-}: UseTestDelegationProps) {
-  const { chain } = useChain();
+}: UseTestDelegationProps): UseTestDelegationReturn {
+  const { chain, ephemeralRpcUrl, ephemeralRpcSubscriptionsUrl } = useChain();
   const signer = useWalletAccountTransactionSigner(payer, chain);
   const counterPda = useCounterPda();
   const photonRpc = usePhoton();
@@ -182,6 +191,13 @@ export function useTestDelegation({
         },
       });
     } catch (error) {
+      await photonRpc.getStateTreeInfos();
+      photonRpc.allStateTreeInfos?.push({
+        tree: BATCHED_MERKLE_TREE,
+        queue: OUTPUT_QUEUE,
+        treeType: TreeType.StateV2,
+        nextTreeInfo: null,
+      });
       // Try getting an existing account
       const compressedDelegatedRecord = await photonRpc.getCompressedAccount(
         delegatedRecordAddress.toBytes()
@@ -295,8 +311,6 @@ export function useTestDelegation({
         );
       }
     );
-    console.log(counterInfo, ephemeral);
-    console.log(message);
 
     const signedTransaction = await signTransactionMessageWithSigners(message);
 
@@ -342,13 +356,20 @@ export function useTestDelegation({
         );
       }
     );
-    console.log(message);
 
     const signedTransaction = await signTransactionMessageWithSigners(message);
-    await sendTransaction({
+    const sig = await sendTransaction({
       ...signedTransaction,
       lifetimeConstraint: latestBlockhash,
     });
+
+    // Waiting for the finalize transaction to be processed
+    const connection = await Connection.create(
+      ephemeralRpcUrl,
+      ephemeralRpcSubscriptionsUrl
+    );
+    const commitmentSignature = await connection.getCommitmentSignature(sig);
+    return commitmentSignature.toString();
   }, [payer, counterPda, signer]);
 
   return {

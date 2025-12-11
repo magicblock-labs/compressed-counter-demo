@@ -19,12 +19,10 @@ export const DEFAULT_CHAIN_CONFIG = Object.freeze({
   displayName: "Devnet",
   solanaExplorerClusterName: "devnet",
   solanaRpcSubscriptionsUrl:
-    import.meta.env.VITE_RPC_URL?.replace("http", "ws") ??
-    `wss://api.devnet.solana.com`,
+    import.meta.env.VITE_RPC_WS_URL ?? `wss://api.devnet.solana.com`,
   solanaRpcUrl: import.meta.env.VITE_RPC_URL ?? `https://api.devnet.solana.com`,
   ephemeralRpcSubscriptionsUrl:
-    import.meta.env.VITE_EPHEMERAL_URL?.replace("http", "ws") ??
-    `wss://testnet-as.magicblock.app`,
+    import.meta.env.VITE_EPHEMERAL_WS_URL ?? `wss://testnet-as.magicblock.app`,
   ephemeralRpcUrl:
     import.meta.env.VITE_EPHEMERAL_URL ?? `https://testnet-as.magicblock.app`,
   photonUrl: import.meta.env.VITE_RPC_URL ?? `http://localhost:8784`,

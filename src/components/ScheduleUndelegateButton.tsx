@@ -10,6 +10,7 @@ import {
   buildSolanaExplorerUrl,
 } from "../utils/transactionErrors";
 import { getErrorMessage } from "../errors";
+import { useCommitment } from "../hooks/useCommitment";
 
 type ScheduleUndelegateButtonProps = Readonly<{
   payer: UiWalletAccount;
@@ -28,12 +29,14 @@ export function ScheduleUndelegateButton({
     rpcSubscriptions: rpcSubscriptionsEphemeral,
   });
   const { solanaExplorerClusterName } = useChain();
+  const { setCommitmentSignature } = useCommitment();
 
   const handleScheduleUndelegateCounter = useCallback(async () => {
     setIsDelegating(true);
     try {
+      setCommitmentSignature(null);
       const signature = await scheduleUndelegateCounter();
-      console.log(signature);
+      setCommitmentSignature(signature);
     } catch (error) {
       console.error(error);
       const signature = extractTransactionSignature(error);

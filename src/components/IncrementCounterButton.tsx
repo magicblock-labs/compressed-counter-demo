@@ -46,8 +46,7 @@ export function IncrementCounterButton({
   const handleIncrementCounter = useCallback(async () => {
     setIsIncrementingCounter(true);
     try {
-      const signature = await incrementCounter();
-      console.log(signature);
+      await incrementCounter();
     } catch (error) {
       console.error(error);
       const signature = extractTransactionSignature(error);

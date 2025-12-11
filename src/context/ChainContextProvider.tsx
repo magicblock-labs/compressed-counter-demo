@@ -45,14 +45,13 @@ export function ChainContextProvider({
           displayName: "Devnet",
           solanaExplorerClusterName: "devnet",
           solanaRpcSubscriptionsUrl: devnet(
-            import.meta.env.VITE_RPC_URL?.replace("http", "ws") ??
-              `wss://api.devnet.solana.com`
+            import.meta.env.VITE_RPC_WS_URL ?? `wss://api.devnet.solana.com`
           ),
           solanaRpcUrl: devnet(
             import.meta.env.VITE_RPC_URL ?? `https://api.devnet.solana.com`
           ),
           ephemeralRpcSubscriptionsUrl: devnet(
-            import.meta.env.VITE_EPHEMERAL_URL?.replace("http", "ws") ??
+            import.meta.env.VITE_EPHEMERAL_WS_URL ??
               `wss://testnet-as.magicblock.app`
           ),
           ephemeralRpcUrl: devnet(

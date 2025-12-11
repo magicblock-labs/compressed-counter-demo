@@ -28,6 +28,7 @@ import {
   deriveAddressSeedV2,
   deriveAddressV2,
   packTreeInfos,
+  TreeType,
 } from "@lightprotocol/stateless.js";
 import { ComputeBudgetProgram, PublicKey } from "@solana/web3.js";
 
@@ -39,6 +40,7 @@ import {
 import { SYSTEM_PROGRAM_ADDRESS } from "@solana-program/system";
 import { TEST_DELEGATION_PROGRAM_ADDRESS } from "test-delegation";
 import { useSendTransaction } from "./useSendTransaction";
+import { BATCHED_MERKLE_TREE, OUTPUT_QUEUE } from "../constants";
 
 type UseCompressedDelegationProps = Readonly<{
   payer: UiWalletAccount;
@@ -63,6 +65,7 @@ export function useCompressedDelegation({
     }
 
     const addressTree = await photonRpc.getAddressTreeInfoV2();
+    addressTree.queue = OUTPUT_QUEUE;
     const encodedCounterPda = getBase58Encoder().encode(counterPda);
     const addressSeed = deriveAddressSeedV2([
       new Uint8Array(encodedCounterPda),
@@ -73,15 +76,21 @@ export function useCompressedDelegation({
       new PublicKey(COMPRESSED_DELEGATION_PROGRAM_ADDRESS)
     );
 
+    // Insert the batched merkle state trees into the photon rpc
+    await photonRpc.getStateTreeInfos();
+    photonRpc.allStateTreeInfos?.push({
+      tree: BATCHED_MERKLE_TREE,
+      queue: OUTPUT_QUEUE,
+      treeType: TreeType.StateV2,
+      nextTreeInfo: null,
+    });
     const compressedDelegatedRecord = await photonRpc.getCompressedAccount(
       bn(delegatedRecordAddress.toBytes())
     );
-    console.log("compressedDelegatedRecord", compressedDelegatedRecord);
     if (!compressedDelegatedRecord || !compressedDelegatedRecord.data) {
       throw new Error("Compressed delegated record not found");
     }
 
-    console.log("delegatedRecordAddress", delegatedRecordAddress);
     const result = await photonRpc.getValidityProofAndRpcContext(
       [
         {
@@ -180,7 +189,7 @@ export function useCompressedDelegation({
         );
       }
     );
-    console.log(message);
+
     const signedTransaction = await signTransactionMessageWithSigners(message);
     await sendTransaction({
       ...signedTransaction,

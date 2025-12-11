@@ -1,3 +1,4 @@
+import "./polyfills";
 import "./index.css";
 import "@radix-ui/themes/styles.css";
 
@@ -12,6 +13,7 @@ import { RpcContextProvider } from "./context/RpcContextProvider.tsx";
 import { SelectedWalletAccountContextProvider } from "./context/SelectedWalletAccountContextProvider.tsx";
 import Root from "./routes/root.tsx";
 import { featureFlags, VERSION } from "@lightprotocol/stateless.js";
+import { CommitmentContextProvider } from "./context/CommitmentContextProvider.tsx";
 
 featureFlags.version = VERSION.V2;
 const rootNode = document.getElementById("root")!;
@@ -22,15 +24,17 @@ root.render(
       <ChainContextProvider>
         <SelectedWalletAccountContextProvider>
           <RpcContextProvider>
-            <Flex direction="column" style={{ minHeight: "100vh" }}>
-              <Nav />
-              <Section
-                style={{ flex: 1, display: "flex", flexDirection: "column" }}
-              >
-                <Root />
-              </Section>
-            </Flex>
-            <Toaster position="top-right" />
+            <CommitmentContextProvider>
+              <Flex direction="column" style={{ minHeight: "100vh" }}>
+                <Nav />
+                <Section
+                  style={{ flex: 1, display: "flex", flexDirection: "column" }}
+                >
+                  <Root />
+                </Section>
+              </Flex>
+              <Toaster position="top-right" />
+            </CommitmentContextProvider>
           </RpcContextProvider>
         </SelectedWalletAccountContextProvider>
       </ChainContextProvider>

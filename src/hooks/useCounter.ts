@@ -21,18 +21,12 @@ export function useCounter() {
       console.log("no counterPda");
       return;
     }
-    console.log("fetchCounter", counterPda);
     let accountInfo = await rpc
       .getAccountInfo(counterPda, {
         commitment: "confirmed",
       })
       .send();
     if (accountInfo.value) {
-      console.log(
-        "counter",
-        accountInfo.value,
-        accountInfo.value.owner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS
-      );
       setMainnetOwner(accountInfo.value.owner);
       if (accountInfo.value.owner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS) {
         accountInfo = await rpcEphemeral
@@ -40,7 +34,6 @@ export function useCounter() {
             commitment: "confirmed",
           })
           .send();
-        console.log("counter ephemeral", accountInfo.value);
         if (accountInfo.value) {
           setEphemeralOwner(accountInfo.value.owner);
           const str =
@@ -74,11 +67,9 @@ export function useCounter() {
         .accountNotifications(counterPda)
         .subscribe({ abortSignal: abortController.signal });
       for await (const accountInfo of subscription) {
-        console.log("mainnet subscription", accountInfo);
         setMainnetOwner(accountInfo.value.owner);
         if (accountInfo.value?.data) {
           const str = getBase58Encoder().encode(accountInfo.value.data);
-          console.log(str);
           setCounterMainnet(getCounterDecoder().decode(str));
         } else if (
           accountInfo.value?.owner === COMPRESSED_DELEGATION_PROGRAM_ADDRESS
@@ -106,7 +97,6 @@ export function useCounter() {
         .accountNotifications(counterPda)
         .subscribe({ abortSignal: abortController.signal });
       for await (const accountInfo of subscription) {
-        console.log("ephem notification", accountInfo);
         setEphemeralOwner(accountInfo.value.owner);
         if (accountInfo.value?.data) {
           const str =

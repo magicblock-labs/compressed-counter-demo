@@ -1,6 +1,6 @@
 import { Button } from "@radix-ui/themes";
 import { UiWalletAccount } from "@wallet-standard/react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useRpc } from "../hooks/useRpc";
 import { useCompressedDelegation } from "../hooks/useCompressedDelegation";
@@ -10,6 +10,7 @@ import {
   buildSolanaExplorerUrl,
 } from "../utils/transactionErrors";
 import { getErrorMessage } from "../errors";
+import { useCommitment } from "../hooks/useCommitment";
 
 type UndelegateButtonProps = Readonly<{
   payer: UiWalletAccount;
@@ -17,7 +18,7 @@ type UndelegateButtonProps = Readonly<{
 }>;
 
 export function UndelegateButton({ payer, disabled }: UndelegateButtonProps) {
-  const [isDelegating, setIsDelegating] = useState(false);
+  const [isUndelegating, setIsUndelegating] = useState(false);
   const { rpc, rpcSubscriptions } = useRpc();
   const { undelegateAccount } = useCompressedDelegation({
     payer,
@@ -25,12 +26,14 @@ export function UndelegateButton({ payer, disabled }: UndelegateButtonProps) {
     rpcSubscriptions,
   });
   const { solanaExplorerClusterName } = useChain();
+  const { commitmentSignature, setCommitmentSignature } = useCommitment();
+  const [isUndelegatable, setIsUndelegatable] = useState(false);
 
   const handleUndelegateCounter = useCallback(async () => {
-    setIsDelegating(true);
+    setIsUndelegating(true);
     try {
-      const signature = await undelegateAccount();
-      console.log(signature);
+      await undelegateAccount();
+      setCommitmentSignature(undefined);
     } catch (error) {
       console.error(error);
       const signature = extractTransactionSignature(error);
@@ -68,15 +71,23 @@ export function UndelegateButton({ payer, disabled }: UndelegateButtonProps) {
         });
       }
     } finally {
-      setIsDelegating(false);
+      setIsUndelegating(false);
     }
   }, [undelegateAccount, solanaExplorerClusterName]);
+
+  useEffect(() => {
+    if (commitmentSignature || commitmentSignature === undefined) {
+      setIsUndelegatable(true);
+    } else {
+      setIsUndelegatable(false);
+    }
+  }, [commitmentSignature]);
 
   return (
     <Button
       onClick={handleUndelegateCounter}
-      loading={isDelegating}
-      disabled={disabled}
+      loading={isUndelegating}
+      disabled={disabled || !isUndelegatable}
     >
       Undelegate Counter
     </Button>

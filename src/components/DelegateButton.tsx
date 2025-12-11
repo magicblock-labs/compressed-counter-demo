@@ -36,8 +36,7 @@ export function DelegateButton({
   const handleDelegateCounter = useCallback(async () => {
     setIsDelegating(true);
     try {
-      const signature = await delegateCounter();
-      console.log(signature);
+      await delegateCounter();
     } catch (error) {
       console.error(error);
       const signature = extractTransactionSignature(error);

@@ -10,7 +10,7 @@ import {
   TransactionMessageWithFeePayer,
   TransactionMessageWithSigners,
   TransactionWithBlockhashLifetime,
-  getBase58Decoder,
+  getSignatureFromTransaction,
 } from "@solana/kit";
 import { useCallback } from "react";
 import { toast } from "sonner";
@@ -39,22 +39,11 @@ export function useSendTransaction({
             TransactionWithBlockhashLifetime
         >
     ) => {
-      console.log(tx);
       // Display toast with first signature
-      const signatureValues = Object.values(tx.signatures).filter(
-        (sig) => sig !== null
-      );
-      if (signatureValues.length > 0) {
-        const firstSignature = signatureValues[0];
-        if (firstSignature !== null) {
-          const signatureBase58 = getBase58Decoder().decode(
-            firstSignature as Uint8Array
-          );
-          toast.success("Transaction sent", {
-            description: signatureBase58,
-          });
-        }
-      }
+      const sig = getSignatureFromTransaction(tx);
+      toast.success("Transaction sent", {
+        description: sig.toString(),
+      });
 
       await sendAndConfirmTransaction(
         {
@@ -68,6 +57,8 @@ export function useSendTransaction({
           skipPreflight: true,
         }
       );
+
+      return sig;
     },
     [sendAndConfirmTransaction]
   );

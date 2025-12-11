@@ -20,11 +20,6 @@ function Root() {
     fetchCounter,
   } = useCounter();
 
-  console.log("mainnetOwner", mainnetOwner);
-  console.log("ephemeralOwner", ephemeralOwner);
-  console.log("counterMainnet", counterMainnet);
-  console.log("counterEphemeral", counterEphemeral);
-
   return (
     <Box
       mx={{ initial: "3", xs: "6" }}
